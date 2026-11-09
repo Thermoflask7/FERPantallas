@@ -4,6 +4,7 @@ enum class Destino(
     val muestraEncabezado: Boolean,
     val muestraBarra: Boolean,
 ) {
+    BIENVENIDA(muestraEncabezado = false, muestraBarra = false),
     PREGUNTAS(muestraEncabezado = true, muestraBarra = true),
     AJUSTES(muestraEncabezado = true, muestraBarra = true),
     SOBRE_TI(muestraEncabezado = false, muestraBarra = false),

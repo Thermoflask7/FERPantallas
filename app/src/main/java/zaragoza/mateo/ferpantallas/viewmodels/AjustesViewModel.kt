@@ -45,6 +45,7 @@ class AjustesViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private companion object {
+        // SobreTiViewModel guarda perfil y nivel en este mismo archivo.
         const val ARCHIVO = "ajustes"
         const val CLAVE_TEMA = "tema"
         const val CLAVE_TAMANO_TEXTO = "tamano_texto"

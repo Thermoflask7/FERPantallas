@@ -52,6 +52,14 @@
     <string name="acerca_fundacion">Fundación Esposos Rodríguez</string>
     <string name="acerca_version">Versión %1$s</string>
     <string name="acerca_privacidad">Los datos de Sobre ti se quedan en este teléfono.</string>
+    <string name="bienvenida_titulo">¡Bienvenido!</string>
+    <string name="bienvenida_subtitulo">Personaliza tu experiencia.</string>
+    <string name="bienvenida_pregunta_perfil">¿Cuál es tu perfil?</string>
+    <string name="bienvenida_pregunta_nivel">¿Cuál es tu nivel educativo?</string>
+    <string name="bienvenida_continuar">Continuar</string>
+    <string name="bienvenida_logo_fundacion">Fundación</string>
+    <string name="bienvenida_logo_esposos">Esposos</string>
+    <string name="bienvenida_logo_rodriguez">Rodríguez</string>
     <string name="sobre_ti_titulo">Sobre ti</string>
     <string name="cd_volver">Volver</string>
     <string name="sobre_ti_nivel">Nivel Educativo</string>
