@@ -31,6 +31,13 @@
     <string name="faq_a_renovacion_aprobada">Respuesta de ejemplo para saber si la renovación fue aprobada.</string>
     <string name="cd_cerrar_respuesta">Cerrar respuesta</string>
     <string name="ajustes_titulo">Ajustes</string>
+    <string name="ajustes_notificaciones">Notificaciones del teléfono</string>
+    <string name="ajustes_notificaciones_activas">Los avisos están activados</string>
+    <string name="ajustes_notificaciones_apagadas">Los avisos están apagados</string>
+    <string name="ajustes_apariencia">Apariencia</string>
+    <string name="tema_claro">Claro</string>
+    <string name="tema_oscuro">Oscuro</string>
+    <string name="tema_sistema">Igual que el teléfono</string>
     <string name="sobre_ti_titulo">Sobre ti</string>
     <string name="cd_volver">Volver</string>
     <string name="sobre_ti_nivel">Nivel Educativo</string>

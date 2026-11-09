@@ -72,7 +72,7 @@ fun SobreTiContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.white)),
+            .background(MaterialTheme.colorScheme.background),
     ) {
         Row(
             modifier = Modifier

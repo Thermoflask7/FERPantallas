@@ -1,6 +1,5 @@
 package zaragoza.mateo.ferpantallas.vistas
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.QuestionMark
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -37,9 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -96,11 +94,11 @@ fun FaqContent(
                 shape = RoundedCornerShape(30.dp),
                 placeholder = { Text(stringResource(R.string.buscar_faq)) },
                 leadingIcon = {
-                    Image(
-                        painter = painterResource(id = R.drawable.lupa),
+                    Icon(
+                        imageVector = Icons.Default.Search,
                         contentDescription = stringResource(R.string.cd_buscar),
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(width = 30.dp, height = 30.dp),
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
             )
@@ -213,7 +211,7 @@ private fun FiltroFaqChip(
             selectedContainerColor = colorResource(id = R.color.azulfer),
             selectedLabelColor = Color.White,
             containerColor = Color.Transparent,
-            labelColor = Color.DarkGray,
+            labelColor = MaterialTheme.colorScheme.onSurface,
         ),
     )
 }
