@@ -54,6 +54,8 @@ import zaragoza.mateo.ferpantallas.modelos.TamanoTexto
 import zaragoza.mateo.ferpantallas.modelos.TemaApp
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
 import zaragoza.mateo.ferpantallas.viewmodels.AjustesViewModel
+import zaragoza.mateo.ferpantallas.viewmodels.EventVM
+import zaragoza.mateo.ferpantallas.viewmodels.PostVM
 import zaragoza.mateo.ferpantallas.viewmodels.SobreTiViewModel
 
 @Composable
@@ -61,6 +63,8 @@ fun Ajustes(
     onSobreTi: () -> Unit,
     viewModel: AjustesViewModel = viewModel(),
     sobreTiViewModel: SobreTiViewModel = viewModel(),
+    postViewModel: PostVM = viewModel(),
+    eventViewModel: EventVM = viewModel(),
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -100,6 +104,8 @@ fun Ajustes(
         onBorrarDatos = {
             viewModel.borrarDatos()
             sobreTiViewModel.restablecer()
+            postViewModel.clearLocalState()
+            eventViewModel.clearLocalState()
             confirmarBorrado = false
         },
         confirmarBorrado = confirmarBorrado,

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,14 +46,17 @@ fun MarcoApp(
         ),
     ) {
         mutableStateOf(
-            if (sobreTiViewModel.bienvenidaCompleta) Destino.PREGUNTAS else Destino.BIENVENIDA,
+            if (sobreTiViewModel.bienvenidaCompleta) Destino.FEED else Destino.BIENVENIDA,
         )
     }
+    var postId by rememberSaveable { mutableIntStateOf(-1) }
+    var eventId by rememberSaveable { mutableIntStateOf(-1) }
+    var detailOrigin by rememberSaveable { mutableStateOf(Destino.FEED.name) }
     LaunchedEffect(sobreTiViewModel.bienvenidaCompleta) {
         if (!sobreTiViewModel.bienvenidaCompleta) {
             destino = Destino.BIENVENIDA
         } else if (destino == Destino.BIENVENIDA) {
-            destino = Destino.PREGUNTAS
+            destino = Destino.FEED
         }
     }
     IconosDeSistema(destino = destino, tema = ajustesViewModel.tema)
@@ -74,8 +78,40 @@ fun MarcoApp(
                 Destino.BIENVENIDA -> Bienvenida(
                     onContinuar = { perfil, nivel ->
                         sobreTiViewModel.guardarBienvenida(perfil, nivel)
-                        destino = Destino.PREGUNTAS
+                        destino = Destino.FEED
                     },
+                )
+                Destino.FEED -> MainFeed(
+                    onPostClick = { id ->
+                        detailOrigin = Destino.FEED.name
+                        postId = id
+                        destino = Destino.POST_DETAIL
+                    },
+                    onEventClick = { id ->
+                        detailOrigin = Destino.FEED.name
+                        eventId = id
+                        destino = Destino.EVENT_DETAIL
+                    },
+                )
+                Destino.LIKED -> LikesScreen(
+                    onPostClick = { id ->
+                        detailOrigin = Destino.LIKED.name
+                        postId = id
+                        destino = Destino.POST_DETAIL
+                    },
+                    onEventClick = { id ->
+                        detailOrigin = Destino.LIKED.name
+                        eventId = id
+                        destino = Destino.EVENT_DETAIL
+                    },
+                )
+                Destino.POST_DETAIL -> PostDetailScreen(
+                    postId = postId,
+                    onBack = { destino = Destino.valueOf(detailOrigin) },
+                )
+                Destino.EVENT_DETAIL -> EventDetailScreen(
+                    eventId = eventId,
+                    onBack = { destino = Destino.valueOf(detailOrigin) },
                 )
                 Destino.PREGUNTAS -> Faq()
                 Destino.AJUSTES -> Ajustes(onSobreTi = { destino = Destino.SOBRE_TI })
@@ -85,6 +121,8 @@ fun MarcoApp(
         if (destino.muestraBarra) {
             BarraInferior(
                 destino = destino,
+                onFeed = { destino = Destino.FEED },
+                onLiked = { destino = Destino.LIKED },
                 onPreguntas = { destino = Destino.PREGUNTAS },
                 onAjustes = { destino = Destino.AJUSTES },
                 modifier = Modifier.padding(16.dp),
@@ -115,7 +153,10 @@ private fun IconosDeSistema(destino: Destino, tema: TemaApp) {
 
 @Composable
 private fun insetsDe(destino: Destino): Modifier {
-    if (destino == Destino.BIENVENIDA) {
+    if (destino == Destino.BIENVENIDA ||
+        destino == Destino.POST_DETAIL ||
+        destino == Destino.EVENT_DETAIL
+    ) {
         return Modifier
     }
     return Modifier

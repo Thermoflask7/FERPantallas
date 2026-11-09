@@ -39,6 +39,8 @@ import zaragoza.mateo.ferpantallas.modelos.Destino
 @Composable
 fun BarraInferior(
     destino: Destino,
+    onFeed: () -> Unit,
+    onLiked: () -> Unit,
     onPreguntas: () -> Unit,
     onAjustes: () -> Unit,
     modifier: Modifier = Modifier,
@@ -57,12 +59,14 @@ fun BarraInferior(
             IconoBarra(
                 icono = Icons.Default.Home,
                 descripcion = stringResource(R.string.cd_nav_inicio),
-                seleccionado = false,
+                seleccionado = destino == Destino.FEED,
+                onClick = onFeed,
             )
             IconoBarra(
                 icono = Icons.Default.StarBorder,
                 descripcion = stringResource(R.string.cd_nav_favoritos),
-                seleccionado = false,
+                seleccionado = destino == Destino.LIKED,
+                onClick = onLiked,
             )
             IconoBarra(
                 icono = Icons.Default.CalendarMonth,
