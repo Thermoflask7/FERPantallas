@@ -12,14 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.Density
 import androidx.core.view.WindowCompat
 import zaragoza.mateo.ferpantallas.R
 
 @Composable
 fun FERPantallasTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    escalaTexto: Float = 1f,
     content: @Composable () -> Unit,
 ) {
     val azulFer = colorResource(R.color.azulfer)
@@ -42,7 +45,14 @@ fun FERPantallasTheme(
         colorScheme = colorScheme,
         typography = Typography,
     ) {
-        CompositionLocalProvider(LocalContentColor provides colorScheme.onSurface) {
+        val densidad = LocalDensity.current
+        CompositionLocalProvider(
+            LocalContentColor provides colorScheme.onSurface,
+            LocalDensity provides Density(
+                density = densidad.density,
+                fontScale = densidad.fontScale * escalaTexto,
+            ),
+        ) {
             content()
         }
     }

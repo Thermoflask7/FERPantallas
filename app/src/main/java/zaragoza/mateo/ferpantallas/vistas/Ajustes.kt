@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -21,12 +22,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -47,18 +50,22 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import zaragoza.mateo.ferpantallas.R
+import zaragoza.mateo.ferpantallas.modelos.TamanoTexto
 import zaragoza.mateo.ferpantallas.modelos.TemaApp
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
 import zaragoza.mateo.ferpantallas.viewmodels.AjustesViewModel
+import zaragoza.mateo.ferpantallas.viewmodels.SobreTiViewModel
 
 @Composable
 fun Ajustes(
     onSobreTi: () -> Unit,
     viewModel: AjustesViewModel = viewModel(),
+    sobreTiViewModel: SobreTiViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var avisosActivos by remember { mutableStateOf(notificacionesActivas(context)) }
+    var confirmarBorrado by remember { mutableStateOf(false) }
     val pedirPermiso = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { concedido ->
@@ -80,6 +87,8 @@ fun Ajustes(
         avisosActivos = avisosActivos,
         tema = viewModel.tema,
         onTema = viewModel::onTemaSeleccionado,
+        tamanoTexto = viewModel.tamanoTexto,
+        onTamanoTexto = viewModel::onTamanoTextoSeleccionado,
         onSobreTi = onSobreTi,
         onNotificaciones = {
             if (avisosActivos || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -88,6 +97,15 @@ fun Ajustes(
                 pedirPermiso.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         },
+        onBorrarDatos = {
+            viewModel.borrarDatos()
+            sobreTiViewModel.restablecer()
+            confirmarBorrado = false
+        },
+        confirmarBorrado = confirmarBorrado,
+        onPedirBorrado = { confirmarBorrado = true },
+        onCancelarBorrado = { confirmarBorrado = false },
+        version = versionApp(context),
     )
 }
 
@@ -96,8 +114,15 @@ fun AjustesContent(
     avisosActivos: Boolean,
     tema: TemaApp,
     onTema: (TemaApp) -> Unit,
+    tamanoTexto: TamanoTexto,
+    onTamanoTexto: (TamanoTexto) -> Unit,
     onSobreTi: () -> Unit,
     onNotificaciones: () -> Unit,
+    onBorrarDatos: () -> Unit,
+    confirmarBorrado: Boolean,
+    onPedirBorrado: () -> Unit,
+    onCancelarBorrado: () -> Unit,
+    version: String,
 ) {
     Column(
         modifier = Modifier
@@ -125,14 +150,68 @@ fun AjustesContent(
             ),
             onClick = onNotificaciones,
         )
-        SeccionApariencia(tema = tema, onTema = onTema)
+        SeccionRadios(
+            titulo = stringResource(R.string.ajustes_apariencia),
+            opciones = TemaApp.entries.map { opcion ->
+                OpcionAjuste(
+                    texto = textoTema(opcion),
+                    seleccionada = tema == opcion,
+                    onClick = { onTema(opcion) },
+                )
+            },
+        )
+        SeccionRadios(
+            titulo = stringResource(R.string.ajustes_accesibilidad),
+            subtitulo = stringResource(R.string.ajustes_tamano_texto),
+            opciones = TamanoTexto.entries.map { opcion ->
+                OpcionAjuste(
+                    texto = textoTamano(opcion),
+                    seleccionada = tamanoTexto == opcion,
+                    onClick = { onTamanoTexto(opcion) },
+                )
+            },
+        )
+        FilaAjustes(
+            titulo = stringResource(R.string.ajustes_borrar),
+            onClick = onPedirBorrado,
+            conFlecha = false,
+            colorTitulo = MaterialTheme.colorScheme.error,
+        )
+        TarjetaAcercaDe(version = version)
+        if (confirmarBorrado) {
+            AlertDialog(
+                onDismissRequest = onCancelarBorrado,
+                title = { Text(text = stringResource(R.string.ajustes_borrar_titulo)) },
+                text = { Text(text = stringResource(R.string.ajustes_borrar_mensaje)) },
+                confirmButton = {
+                    TextButton(onClick = onBorrarDatos) {
+                        Text(
+                            text = stringResource(R.string.ajustes_borrar_confirmar),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = onCancelarBorrado) {
+                        Text(text = stringResource(R.string.ajustes_cancelar))
+                    }
+                },
+            )
+        }
     }
 }
 
+private data class OpcionAjuste(
+    val texto: String,
+    val seleccionada: Boolean,
+    val onClick: () -> Unit,
+)
+
 @Composable
-private fun SeccionApariencia(
-    tema: TemaApp,
-    onTema: (TemaApp) -> Unit,
+private fun SeccionRadios(
+    titulo: String,
+    opciones: List<OpcionAjuste>,
+    subtitulo: String? = null,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -140,27 +219,35 @@ private fun SeccionApariencia(
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)) {
             Text(
-                text = stringResource(R.string.ajustes_apariencia),
+                text = titulo,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.bodyLarge,
             )
-            TemaApp.entries.forEach { opcion ->
+            if (subtitulo != null) {
+                Text(
+                    text = subtitulo,
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            opciones.forEach { opcion ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onTema(opcion) }
+                        .clickable(onClick = opcion.onClick)
                         .padding(end = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
-                        selected = tema == opcion,
-                        onClick = { onTema(opcion) },
+                        selected = opcion.seleccionada,
+                        onClick = opcion.onClick,
                         colors = RadioButtonDefaults.colors(
                             selectedColor = colorResource(R.color.azulfer),
                         ),
                     )
                     Text(
-                        text = textoTema(opcion),
+                        text = opcion.texto,
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -179,10 +266,21 @@ private fun textoTema(tema: TemaApp): String {
 }
 
 @Composable
+private fun textoTamano(tamano: TamanoTexto): String {
+    return when (tamano) {
+        TamanoTexto.NORMAL -> stringResource(R.string.tamano_normal)
+        TamanoTexto.GRANDE -> stringResource(R.string.tamano_grande)
+        TamanoTexto.MUY_GRANDE -> stringResource(R.string.tamano_muy_grande)
+    }
+}
+
+@Composable
 private fun FilaAjustes(
     titulo: String,
     onClick: () -> Unit,
     subtitulo: String? = null,
+    conFlecha: Boolean = true,
+    colorTitulo: Color = Color.Unspecified,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -202,6 +300,7 @@ private fun FilaAjustes(
             ) {
                 Text(
                     text = titulo,
+                    color = colorTitulo,
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 if (subtitulo != null) {
@@ -212,13 +311,71 @@ private fun FilaAjustes(
                     )
                 }
             }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = colorResource(R.color.azulfer),
+            if (conFlecha) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = colorResource(R.color.azulfer),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TarjetaAcercaDe(version: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(30.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.ajustes_acerca),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                text = stringResource(R.string.acerca_fundacion),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = stringResource(R.string.acerca_version, version),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = stringResource(R.string.faq_contacto_celular),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = stringResource(R.string.faq_contacto_correo),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = stringResource(R.string.acerca_privacidad),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
+}
+
+private fun versionApp(context: Context): String {
+    val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.packageManager.getPackageInfo(
+            context.packageName,
+            PackageManager.PackageInfoFlags.of(0),
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        context.packageManager.getPackageInfo(context.packageName, 0)
+    }
+    return info.versionName.orEmpty()
 }
 
 private fun notificacionesActivas(context: Context): Boolean {
@@ -264,8 +421,15 @@ fun AjustesPreview() {
             avisosActivos = true,
             tema = TemaApp.SISTEMA,
             onTema = {},
+            tamanoTexto = TamanoTexto.NORMAL,
+            onTamanoTexto = {},
             onSobreTi = {},
             onNotificaciones = {},
+            onBorrarDatos = {},
+            confirmarBorrado = false,
+            onPedirBorrado = {},
+            onCancelarBorrado = {},
+            version = "1.0",
         )
     }
 }

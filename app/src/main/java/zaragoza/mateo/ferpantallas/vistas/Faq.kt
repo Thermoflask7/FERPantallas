@@ -75,12 +75,7 @@ fun FaqContent(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -125,6 +120,15 @@ fun FaqContent(
                     modifier = Modifier.weight(1f),
                 )
             }
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(30.dp),
@@ -142,14 +146,11 @@ fun FaqContent(
                     }
                 }
             }
-        }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(30.dp),
-            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.azulfer)),
-        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(30.dp),
+                colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.azulfer)),
+            ) {
                 CompositionLocalProvider(LocalContentColor provides Color.White) {
                     Row(
                         modifier = Modifier
@@ -189,6 +190,7 @@ fun FaqContent(
             }
         }
     }
+}
 
 @Composable
 private fun FiltroFaqChip(

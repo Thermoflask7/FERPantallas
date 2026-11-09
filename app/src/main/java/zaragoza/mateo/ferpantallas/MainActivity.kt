@@ -26,7 +26,10 @@ class MainActivity : ComponentActivity() {
                 TemaApp.OSCURO -> true
                 TemaApp.SISTEMA -> isSystemInDarkTheme()
             }
-            FERPantallasTheme(darkTheme = oscuro) {
+            FERPantallasTheme(
+                darkTheme = oscuro,
+                escalaTexto = ajustesViewModel.tamanoTexto.escala,
+            ) {
                 MarcoApp()
             }
         }

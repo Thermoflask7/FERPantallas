@@ -15,14 +15,14 @@ class SobreTiViewModel : ViewModel() {
     var perfil by mutableStateOf(PerfilBeca.BECADO)
         private set
 
-    var avisos by mutableStateOf(
-        setOf(
-            CategoriaAviso.RENOVACION,
-            CategoriaAviso.EVENTOS_SOCIALES,
-            CategoriaAviso.ANUNCIOS,
-        ),
-    )
+    var avisos by mutableStateOf(avisosIniciales())
         private set
+
+    fun restablecer() {
+        nivel = NivelEducativo.UNIVERSIDAD
+        perfil = PerfilBeca.ASPIRANTE
+        avisos = avisosIniciales()
+    }
 
     fun onNivelSeleccionado(nivel: NivelEducativo) {
         this.nivel = nivel
@@ -34,5 +34,16 @@ class SobreTiViewModel : ViewModel() {
 
     fun onAvisoCambiado(aviso: CategoriaAviso) {
         avisos = if (aviso in avisos) avisos - aviso else avisos + aviso
+    }
+
+    private companion object {
+        fun avisosIniciales(): Set<CategoriaAviso> {
+            return setOf(
+                CategoriaAviso.CONVOCATORIAS,
+                CategoriaAviso.RENOVACION,
+                CategoriaAviso.EVENTOS_SOCIALES,
+                CategoriaAviso.ANUNCIOS,
+            )
+        }
     }
 }
