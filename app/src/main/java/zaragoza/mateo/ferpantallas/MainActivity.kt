@@ -8,8 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import zaragoza.mateo.faqfundacionespososrodriguez.vistas.Faq
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
+import zaragoza.mateo.ferpantallas.vistas.MarcoApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FERPantallasTheme {
-                Faq()
+                MarcoApp()
             }
         }
     }

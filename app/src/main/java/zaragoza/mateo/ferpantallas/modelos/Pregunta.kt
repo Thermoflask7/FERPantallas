@@ -1,8 +1,8 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-data class Pregunta (
+data class Pregunta(
     val id: Int,
-    val text: String,
-    val category: String = "Todas"
+    val textRes: Int,
+    val answerRes: Int,
+    val category: CategoriaFaq,
 )
-
