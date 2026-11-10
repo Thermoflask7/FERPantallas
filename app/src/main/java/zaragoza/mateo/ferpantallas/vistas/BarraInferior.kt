@@ -6,30 +6,35 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -45,42 +50,46 @@ fun BarraInferior(
     onAjustes: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(30.dp),
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = 12.dp, vertical = 12.dp),
+        shape = RoundedCornerShape(50),
+        color = Color.White,
+        shadowElevation = 8.dp,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 8.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconoBarra(
-                icono = Icons.Default.Home,
+                icono = Icons.Outlined.Home,
+                iconoSeleccionado = Icons.Filled.Home,
                 descripcion = stringResource(R.string.cd_nav_inicio),
                 seleccionado = destino == Destino.FEED,
                 onClick = onFeed,
             )
             IconoBarra(
-                icono = Icons.Default.StarBorder,
+                icono = Icons.Outlined.FavoriteBorder,
+                iconoSeleccionado = Icons.Filled.Favorite,
                 descripcion = stringResource(R.string.cd_nav_favoritos),
                 seleccionado = destino == Destino.LIKED,
                 onClick = onLiked,
             )
             IconoBarra(
-                icono = Icons.Default.CalendarMonth,
-                descripcion = stringResource(R.string.cd_nav_calendario),
-                seleccionado = false,
-            )
-            IconoBarra(
-                icono = Icons.Default.Info,
+                icono = Icons.Outlined.Info,
+                iconoSeleccionado = Icons.Filled.Info,
                 descripcion = stringResource(R.string.cd_nav_info),
                 seleccionado = destino == Destino.PREGUNTAS,
                 onClick = onPreguntas,
             )
             IconoBarra(
-                icono = Icons.Default.Settings,
+                icono = Icons.Outlined.Settings,
+                iconoSeleccionado = Icons.Filled.Settings,
                 descripcion = stringResource(R.string.cd_nav_ajustes),
                 seleccionado = destino == Destino.AJUSTES,
                 onClick = onAjustes,
@@ -92,38 +101,36 @@ fun BarraInferior(
 @Composable
 private fun IconoBarra(
     icono: ImageVector,
+    iconoSeleccionado: ImageVector,
     descripcion: String,
     seleccionado: Boolean,
-    onClick: (() -> Unit)? = null,
+    onClick: () -> Unit,
 ) {
-    val azul = colorResource(R.color.azulfer)
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    val tint = if (seleccionado) MaterialTheme.colorScheme.primary else Color(0xFF5F5F5F)
+
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .semantics { selected = seleccionado }
+            .clickable(role = Role.Tab, onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Icon(
-            imageVector = icono,
+            imageVector = if (seleccionado) iconoSeleccionado else icono,
             contentDescription = descripcion,
-            modifier = Modifier
-                .size(50.dp)
-                .then(
-                    if (onClick == null) {
-                        Modifier
-                    } else {
-                        Modifier
-                            .clickable(onClick = onClick)
-                            .semantics {
-                                role = Role.Tab
-                                selected = seleccionado
-                            }
-                    },
-                ),
-            tint = azul,
+            tint = tint,
+            modifier = Modifier.size(30.dp),
         )
+
+        Spacer(Modifier.height(4.dp))
+
         Box(
             modifier = Modifier
-                .padding(top = 2.dp)
                 .width(28.dp)
-                .height(3.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(if (seleccionado) azul else Color.Transparent),
+                .height(4.dp)
+                .clip(RoundedCornerShape(50))
+                .background(if (seleccionado) tint else Color.Transparent),
         )
     }
 }
