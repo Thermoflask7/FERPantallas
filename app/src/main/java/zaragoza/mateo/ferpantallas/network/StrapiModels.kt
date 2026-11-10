@@ -17,7 +17,7 @@ data class MediaDto(
 data class AttachmentDto(
     val id: Int? = null,
     val type: String? = null,
-    val media: MediaDto? = null,
+    val media: List<MediaDto>? = null,
     val thumbnail: MediaDto? = null,
     val url: String? = null,
     val title: String? = null,
