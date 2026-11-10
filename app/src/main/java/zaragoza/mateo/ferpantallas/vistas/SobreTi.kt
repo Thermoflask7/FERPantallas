@@ -209,8 +209,6 @@ private fun CirculoOpcion(seleccionado: Boolean) {
 @Composable
 private fun textoNivel(nivel: NivelEducativo): String {
     return when (nivel) {
-        NivelEducativo.PRIMARIA -> stringResource(R.string.nivel_primaria)
-        NivelEducativo.SECUNDARIA -> stringResource(R.string.nivel_secundaria)
         NivelEducativo.PREPARATORIA -> stringResource(R.string.nivel_preparatoria)
         NivelEducativo.UNIVERSIDAD -> stringResource(R.string.nivel_universidad)
         NivelEducativo.POSGRADO -> stringResource(R.string.nivel_posgrado)

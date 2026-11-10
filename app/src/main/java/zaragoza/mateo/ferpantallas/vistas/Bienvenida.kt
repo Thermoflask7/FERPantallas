@@ -2,15 +2,18 @@ package zaragoza.mateo.ferpantallas.vistas
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +29,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +53,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -67,6 +74,8 @@ private val AzulClaro = Color(0xFF3A5EBC)
 private val AzulProfundo = Color(0xFF2A4596)
 private val TextoMarino = Color(0xFF1E2C7C)
 private val Subtitulo = Color(0xFFC5CCF2)
+
+private const val TOTAL_PASOS = 2
 
 private val Montserrat = FontFamily(
     Font(R.font.montserrat_regular, FontWeight.Normal),
@@ -94,31 +103,36 @@ fun Bienvenida(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
-                .padding(horizontal = 40.dp),
+                .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(36.dp))
+            Spacer(Modifier.height(32.dp))
             LogoBienvenida()
             Spacer(Modifier.height(28.dp))
             Text(
                 text = stringResource(R.string.bienvenida_titulo),
+                textAlign = TextAlign.Center,
                 style = TextStyle(
                     fontFamily = Montserrat,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 44.sp,
+                    fontSize = 42.sp,
                     color = Color.White,
                 ),
             )
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.bienvenida_subtitulo),
+                textAlign = TextAlign.Center,
                 style = TextStyle(
                     fontFamily = Montserrat,
-                    fontSize = 18.sp,
+                    fontSize = 17.sp,
                     color = Subtitulo,
                     letterSpacing = 0.3.sp,
                 ),
             )
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(24.dp))
+            IndicadorPasos(total = TOTAL_PASOS, actual = paso)
+            Spacer(Modifier.height(24.dp))
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -128,10 +142,11 @@ fun Bienvenida(
             ) {
                 AnimatedContent(
                     targetState = paso,
+                    modifier = Modifier.fillMaxWidth(),
                     transitionSpec = {
                         val direccion = if (targetState > initialState) 1 else -1
                         (slideInHorizontally { it * direccion / 3 } + fadeIn()) togetherWith
-                            (slideOutHorizontally { -it * direccion / 3 } + fadeOut())
+                                (slideOutHorizontally { -it * direccion / 3 } + fadeOut())
                     },
                     label = "pasoBienvenida",
                 ) { actual ->
@@ -160,6 +175,7 @@ fun Bienvenida(
                     }
                 }
             }
+            Spacer(Modifier.height(16.dp))
             val puedeContinuar = if (paso == 0) perfil != null else nivel != null
             BotonContinuar(
                 habilitado = puedeContinuar,
@@ -208,6 +224,17 @@ private fun FondoBienvenida(
                         radius = size.width * 0.6f,
                     ),
                 )
+                // Círculos suaves decorativos
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.05f),
+                    radius = size.width * 0.55f,
+                    center = Offset(size.width * 1.05f, size.height * 0.04f),
+                )
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.04f),
+                    radius = size.width * 0.4f,
+                    center = Offset(-size.width * 0.1f, size.height * 0.88f),
+                )
             },
         content = content,
     )
@@ -238,6 +265,32 @@ private fun LogoBienvenida() {
     }
 }
 
+@Composable
+private fun IndicadorPasos(total: Int, actual: Int) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(total) { indice ->
+            val ancho by animateDpAsState(
+                targetValue = if (indice == actual) 28.dp else 8.dp,
+                label = "anchoPaso",
+            )
+            val color by animateColorAsState(
+                targetValue = if (indice <= actual) Color.White else Color.White.copy(alpha = 0.3f),
+                label = "colorPaso",
+            )
+            Box(
+                Modifier
+                    .height(8.dp)
+                    .width(ancho)
+                    .clip(CircleShape)
+                    .background(color),
+            )
+        }
+    }
+}
+
 private data class OpcionBienvenida(
     val texto: String,
     val seleccionada: Boolean,
@@ -252,16 +305,18 @@ private fun PreguntaOpciones(
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
             text = pregunta,
+            textAlign = TextAlign.Center,
             style = TextStyle(
                 fontFamily = Montserrat,
-                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                fontSize = 20.sp,
                 color = Color.White,
             ),
-            modifier = Modifier.padding(bottom = 2.dp),
+            modifier = Modifier.padding(bottom = 6.dp),
         )
         opciones.forEach { opcion ->
             PastillaOpcion(
@@ -279,25 +334,56 @@ private fun PastillaOpcion(
     seleccionada: Boolean,
     onClick: () -> Unit,
 ) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        color = if (seleccionada) TextoMarino else Color.White,
-        border = if (seleccionada) BorderStroke(1.5.dp, Color.White) else null,
+    val fondo by animateColorAsState(
+        targetValue = if (seleccionada) Color.White else Color.White.copy(alpha = 0.12f),
+        label = "fondoOpcion",
+    )
+    val colorTexto by animateColorAsState(
+        targetValue = if (seleccionada) TextoMarino else Color.White,
+        label = "textoOpcion",
+    )
+    val colorBorde by animateColorAsState(
+        targetValue = if (seleccionada) Color.White else Color.White.copy(alpha = 0.35f),
+        label = "bordeOpcion",
+    )
+    val forma = RoundedCornerShape(50)
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp),
+            .height(52.dp)
+            .clip(forma)
+            .background(fondo)
+            .border(1.dp, colorBorde, forma)
+            .selectable(
+                selected = seleccionada,
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = texto,
-                style = TextStyle(
-                    fontFamily = Montserrat,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 19.sp,
-                    letterSpacing = 0.4.sp,
-                    color = if (seleccionada) Color.White else TextoMarino,
-                ),
+        Text(
+            text = texto,
+            style = TextStyle(
+                fontFamily = Montserrat,
+                fontWeight = FontWeight.Medium,
+                fontSize = 17.sp,
+                letterSpacing = 0.4.sp,
+                color = colorTexto,
+            ),
+        )
+        AnimatedVisibility(
+            visible = seleccionada,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                tint = TextoMarino,
+                modifier = Modifier.size(20.dp),
             )
         }
     }
@@ -314,49 +400,53 @@ private fun BotonContinuar(
     )
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .alpha(alpha)
+            .fillMaxWidth()
+            .height(54.dp)
             .clip(CircleShape)
-            .clickable(enabled = habilitado, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .background(Color.White)
+            .clickable(enabled = habilitado, role = Role.Button, onClick = onClick),
     ) {
         Text(
             text = stringResource(R.string.bienvenida_continuar),
             style = TextStyle(
                 fontFamily = Montserrat,
+                fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
-                color = Subtitulo,
+                color = TextoMarino,
                 letterSpacing = 0.3.sp,
             ),
         )
-        Spacer(Modifier.width(14.dp))
-        FlechaDerecha(Modifier.size(18.dp))
+        Spacer(Modifier.width(12.dp))
+        FlechaDerecha(color = TextoMarino, modifier = Modifier.size(18.dp))
     }
 }
 
 @Composable
-private fun FlechaDerecha(modifier: Modifier = Modifier) {
+private fun FlechaDerecha(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier) {
         val stroke = size.width * 0.14f
         val medio = size.height / 2
         val punta = size.width * 0.92f
         val cabeza = size.width * 0.4f
         drawLine(
-            Subtitulo,
+            color,
             Offset(size.width * 0.08f, medio),
             Offset(punta, medio),
             stroke,
             StrokeCap.Round,
         )
         drawLine(
-            Subtitulo,
+            color,
             Offset(punta - cabeza, medio - cabeza),
             Offset(punta, medio),
             stroke,
             StrokeCap.Round,
         )
         drawLine(
-            Subtitulo,
+            color,
             Offset(punta - cabeza, medio + cabeza),
             Offset(punta, medio),
             stroke,
@@ -376,8 +466,6 @@ private fun textoPerfil(perfil: PerfilBeca): String {
 @Composable
 private fun textoNivel(nivel: NivelEducativo): String {
     return when (nivel) {
-        NivelEducativo.PRIMARIA -> stringResource(R.string.nivel_primaria)
-        NivelEducativo.SECUNDARIA -> stringResource(R.string.nivel_secundaria)
         NivelEducativo.PREPARATORIA -> stringResource(R.string.nivel_preparatoria)
         NivelEducativo.UNIVERSIDAD -> stringResource(R.string.nivel_universidad)
         NivelEducativo.POSGRADO -> stringResource(R.string.nivel_posgrado)
