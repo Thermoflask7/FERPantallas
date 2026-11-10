@@ -33,7 +33,8 @@ private fun String?.toLocalDateTime(): LocalDateTime? {
 
 private fun AttachmentDto.toAttachment(index: Int): PostAttachment? {
     val attachmentId = id?.toString() ?: index.toString()
-    val mediaUrl = media.absoluteUrl()
+    val firstMedia = media?.firstOrNull()
+    val mediaUrl = firstMedia.absoluteUrl()
     val externalUrl = url?.takeIf { it.isNotBlank() }
 
     return when (type) {
@@ -41,8 +42,8 @@ private fun AttachmentDto.toAttachment(index: Int): PostAttachment? {
             PostAttachment.Image(
                 id = attachmentId,
                 url = it,
-                width = media?.width,
-                height = media?.height
+                width = firstMedia?.width,
+                height = firstMedia?.height
             )
         }
 
@@ -67,16 +68,15 @@ private fun AttachmentDto.toAttachment(index: Int): PostAttachment? {
             PostAttachment.File(
                 id = attachmentId,
                 url = it,
-                name = media?.name ?: title ?: "Archivo",
-                mimeType = media?.mime ?: "application/octet-stream",
-                size = media?.size?.let { kb -> (kb * 1024).toLong() }
+                name = firstMedia?.name ?: title ?: "Archivo",
+                mimeType = firstMedia?.mime ?: "application/octet-stream",
+                size = firstMedia?.size?.let { kb -> (kb * 1024).toLong() }
             )
         }
 
         else -> null
     }
 }
-
 fun PostDto.toModel(): Post? {
     val postId = id ?: return null
     val published = publishedAt.toLocalDateTime()
