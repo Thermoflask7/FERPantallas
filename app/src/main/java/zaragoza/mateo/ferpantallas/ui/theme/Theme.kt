@@ -29,7 +29,12 @@ fun FERPantallasTheme(
     val colorScheme = if (darkTheme) {
         darkColorScheme(primary = azulFer, onPrimary = Color.White)
     } else {
-        lightColorScheme(primary = azulFer, onPrimary = Color.White)
+        lightColorScheme(
+            primary = azulFer,
+            onPrimary = Color.White,
+            background = Color.White,
+            surface = Color.White,
+        )
     }
     val view = LocalView.current
     val activity = view.context.buscarActividad()
