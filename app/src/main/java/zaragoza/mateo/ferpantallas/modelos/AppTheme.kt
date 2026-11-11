@@ -1,6 +1,7 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-enum class TemaApp {
+// CLARO, OSCURO and SISTEMA are saved on the device.
+enum class AppTheme {
     CLARO,
     OSCURO,
     SISTEMA,

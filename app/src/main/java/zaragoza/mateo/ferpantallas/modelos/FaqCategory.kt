@@ -1,6 +1,6 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-enum class CategoriaFaq {
+enum class FaqCategory {
     TODAS,
     ASPIRANTES,
     BECARIOS,

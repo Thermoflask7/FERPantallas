@@ -38,15 +38,15 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import zaragoza.mateo.ferpantallas.R
-import zaragoza.mateo.ferpantallas.modelos.Destino
+import zaragoza.mateo.ferpantallas.modelos.Destination
 
 @Composable
-fun BarraInferior(
-    destino: Destino,
+fun BottomBar(
+    destination: Destination,
     onFeed: () -> Unit,
     onLiked: () -> Unit,
-    onPreguntas: () -> Unit,
-    onAjustes: () -> Unit,
+    onFaq: () -> Unit,
+    onSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -64,59 +64,59 @@ fun BarraInferior(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconoBarra(
-                icono = Icons.Outlined.Home,
-                iconoSeleccionado = Icons.Filled.Home,
-                descripcion = stringResource(R.string.cd_nav_inicio),
-                seleccionado = destino == Destino.FEED,
+            BarIcon(
+                icon = Icons.Outlined.Home,
+                selectedIcon = Icons.Filled.Home,
+                description = stringResource(R.string.cd_nav_inicio),
+                isSelected = destination == Destination.FEED,
                 onClick = onFeed,
             )
-            IconoBarra(
-                icono = Icons.Outlined.FavoriteBorder,
-                iconoSeleccionado = Icons.Filled.Favorite,
-                descripcion = stringResource(R.string.cd_nav_favoritos),
-                seleccionado = destino == Destino.LIKED,
+            BarIcon(
+                icon = Icons.Outlined.FavoriteBorder,
+                selectedIcon = Icons.Filled.Favorite,
+                description = stringResource(R.string.cd_nav_favoritos),
+                isSelected = destination == Destination.LIKED,
                 onClick = onLiked,
             )
-            IconoBarra(
-                icono = Icons.Outlined.Info,
-                iconoSeleccionado = Icons.Filled.Info,
-                descripcion = stringResource(R.string.cd_nav_info),
-                seleccionado = destino == Destino.PREGUNTAS,
-                onClick = onPreguntas,
+            BarIcon(
+                icon = Icons.Outlined.Info,
+                selectedIcon = Icons.Filled.Info,
+                description = stringResource(R.string.cd_nav_info),
+                isSelected = destination == Destination.PREGUNTAS,
+                onClick = onFaq,
             )
-            IconoBarra(
-                icono = Icons.Outlined.Settings,
-                iconoSeleccionado = Icons.Filled.Settings,
-                descripcion = stringResource(R.string.cd_nav_ajustes),
-                seleccionado = destino == Destino.AJUSTES,
-                onClick = onAjustes,
+            BarIcon(
+                icon = Icons.Outlined.Settings,
+                selectedIcon = Icons.Filled.Settings,
+                description = stringResource(R.string.cd_nav_ajustes),
+                isSelected = destination == Destination.AJUSTES,
+                onClick = onSettings,
             )
         }
     }
 }
 
 @Composable
-private fun IconoBarra(
-    icono: ImageVector,
-    iconoSeleccionado: ImageVector,
-    descripcion: String,
-    seleccionado: Boolean,
+private fun BarIcon(
+    icon: ImageVector,
+    selectedIcon: ImageVector,
+    description: String,
+    isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val tint = if (seleccionado) MaterialTheme.colorScheme.primary else Color(0xFF5F5F5F)
+    val tint = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF5F5F5F)
 
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
-            .semantics { selected = seleccionado }
+            .semantics { selected = isSelected }
             .clickable(role = Role.Tab, onClick = onClick)
             .padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
-            imageVector = if (seleccionado) iconoSeleccionado else icono,
-            contentDescription = descripcion,
+            imageVector = if (isSelected) selectedIcon else icon,
+            contentDescription = description,
             tint = tint,
             modifier = Modifier.size(30.dp),
         )
@@ -128,7 +128,7 @@ private fun IconoBarra(
                 .width(28.dp)
                 .height(4.dp)
                 .clip(RoundedCornerShape(50))
-                .background(if (seleccionado) tint else Color.Transparent),
+                .background(if (isSelected) tint else Color.Transparent),
         )
     }
 }

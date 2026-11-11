@@ -1,6 +1,6 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-enum class CategoriaAviso {
+enum class NoticeCategory {
     CONVOCATORIAS,
     RENOVACION,
     EVENTOS_SOCIALES,

@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
+import android.provider.Settings as AndroidSettings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -51,84 +51,84 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import zaragoza.mateo.ferpantallas.R
-import zaragoza.mateo.ferpantallas.modelos.TamanoTexto
-import zaragoza.mateo.ferpantallas.modelos.TemaApp
+import zaragoza.mateo.ferpantallas.modelos.TextSize
+import zaragoza.mateo.ferpantallas.modelos.AppTheme
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
-import zaragoza.mateo.ferpantallas.viewmodels.AjustesViewModel
+import zaragoza.mateo.ferpantallas.viewmodels.SettingsViewModel
 import zaragoza.mateo.ferpantallas.viewmodels.EventVM
 import zaragoza.mateo.ferpantallas.viewmodels.PostVM
-import zaragoza.mateo.ferpantallas.viewmodels.SobreTiViewModel
+import zaragoza.mateo.ferpantallas.viewmodels.AboutYouViewModel
 
 @Composable
-fun Ajustes(
-    onSobreTi: () -> Unit,
-    viewModel: AjustesViewModel = viewModel(),
-    sobreTiViewModel: SobreTiViewModel = viewModel(),
+fun Settings(
+    onAboutYou: () -> Unit,
+    viewModel: SettingsViewModel = viewModel(),
+    aboutYouViewModel: AboutYouViewModel = viewModel(),
     postViewModel: PostVM = viewModel(),
     eventViewModel: EventVM = viewModel(),
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    var avisosActivos by remember { mutableStateOf(notificacionesActivas(context)) }
-    var confirmarBorrado by remember { mutableStateOf(false) }
-    val pedirPermiso = rememberLauncherForActivityResult(
+    var notificationsOn by remember { mutableStateOf(notificationsEnabled(context)) }
+    var confirmDeletion by remember { mutableStateOf(false) }
+    val requestPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
-    ) { concedido ->
-        avisosActivos = concedido || notificacionesActivas(context)
-        if (!concedido && !puedeVolverAPedirPermiso(context)) {
-            abrirAjustesNotificaciones(context)
+    ) { granted ->
+        notificationsOn = granted || notificationsEnabled(context)
+        if (!granted && !canAskNotificationPermissionAgain(context)) {
+            openNotificationSettings(context)
         }
     }
     DisposableEffect(lifecycleOwner, context) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                avisosActivos = notificacionesActivas(context)
+                notificationsOn = notificationsEnabled(context)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    AjustesContent(
-        avisosActivos = avisosActivos,
-        tema = viewModel.tema,
-        onTema = viewModel::onTemaSeleccionado,
-        tamanoTexto = viewModel.tamanoTexto,
-        onTamanoTexto = viewModel::onTamanoTextoSeleccionado,
-        onSobreTi = onSobreTi,
-        onNotificaciones = {
-            if (avisosActivos || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                abrirAjustesNotificaciones(context)
+    SettingsContent(
+        notificationsOn = notificationsOn,
+        theme = viewModel.theme,
+        onTheme = viewModel::onThemeSelected,
+        textSize = viewModel.textSize,
+        onTextSize = viewModel::onTextSizeSelected,
+        onAboutYou = onAboutYou,
+        onNotifications = {
+            if (notificationsOn || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                openNotificationSettings(context)
             } else {
-                pedirPermiso.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                requestPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
         },
-        onBorrarDatos = {
-            viewModel.borrarDatos()
-            sobreTiViewModel.restablecer()
+        onClearData = {
+            viewModel.clearData()
+            aboutYouViewModel.reset()
             postViewModel.clearLocalState()
             eventViewModel.clearLocalState()
-            confirmarBorrado = false
+            confirmDeletion = false
         },
-        confirmarBorrado = confirmarBorrado,
-        onPedirBorrado = { confirmarBorrado = true },
-        onCancelarBorrado = { confirmarBorrado = false },
-        version = versionApp(context),
+        confirmDeletion = confirmDeletion,
+        onRequestDeletion = { confirmDeletion = true },
+        onCancelDeletion = { confirmDeletion = false },
+        version = appVersion(context),
     )
 }
 
 @Composable
-fun AjustesContent(
-    avisosActivos: Boolean,
-    tema: TemaApp,
-    onTema: (TemaApp) -> Unit,
-    tamanoTexto: TamanoTexto,
-    onTamanoTexto: (TamanoTexto) -> Unit,
-    onSobreTi: () -> Unit,
-    onNotificaciones: () -> Unit,
-    onBorrarDatos: () -> Unit,
-    confirmarBorrado: Boolean,
-    onPedirBorrado: () -> Unit,
-    onCancelarBorrado: () -> Unit,
+fun SettingsContent(
+    notificationsOn: Boolean,
+    theme: AppTheme,
+    onTheme: (AppTheme) -> Unit,
+    textSize: TextSize,
+    onTextSize: (TextSize) -> Unit,
+    onAboutYou: () -> Unit,
+    onNotifications: () -> Unit,
+    onClearData: () -> Unit,
+    confirmDeletion: Boolean,
+    onRequestDeletion: () -> Unit,
+    onCancelDeletion: () -> Unit,
     version: String,
 ) {
     Column(
@@ -142,56 +142,56 @@ fun AjustesContent(
             text = stringResource(R.string.ajustes_titulo),
             style = MaterialTheme.typography.titleLarge,
         )
-        FilaAjustes(
-            titulo = stringResource(R.string.sobre_ti_titulo),
-            onClick = onSobreTi,
+        SettingsRow(
+            title = stringResource(R.string.sobre_ti_titulo),
+            onClick = onAboutYou,
         )
-        FilaAjustes(
-            titulo = stringResource(R.string.ajustes_notificaciones),
-            subtitulo = stringResource(
-                if (avisosActivos) {
+        SettingsRow(
+            title = stringResource(R.string.ajustes_notificaciones),
+            subtitle = stringResource(
+                if (notificationsOn) {
                     R.string.ajustes_notificaciones_activas
                 } else {
                     R.string.ajustes_notificaciones_apagadas
                 },
             ),
-            onClick = onNotificaciones,
+            onClick = onNotifications,
         )
-        SeccionRadios(
-            titulo = stringResource(R.string.ajustes_apariencia),
-            opciones = TemaApp.entries.map { opcion ->
-                OpcionAjuste(
-                    texto = textoTema(opcion),
-                    seleccionada = tema == opcion,
-                    onClick = { onTema(opcion) },
+        RadioSection(
+            title = stringResource(R.string.ajustes_apariencia),
+            options = AppTheme.entries.map { option ->
+                SettingsOption(
+                    text = themeLabel(option),
+                    selected = theme == option,
+                    onClick = { onTheme(option) },
                 )
             },
         )
-        SeccionRadios(
-            titulo = stringResource(R.string.ajustes_accesibilidad),
-            subtitulo = stringResource(R.string.ajustes_tamano_texto),
-            opciones = TamanoTexto.entries.map { opcion ->
-                OpcionAjuste(
-                    texto = textoTamano(opcion),
-                    seleccionada = tamanoTexto == opcion,
-                    onClick = { onTamanoTexto(opcion) },
+        RadioSection(
+            title = stringResource(R.string.ajustes_accesibilidad),
+            subtitle = stringResource(R.string.ajustes_tamano_texto),
+            options = TextSize.entries.map { option ->
+                SettingsOption(
+                    text = textSizeLabel(option),
+                    selected = textSize == option,
+                    onClick = { onTextSize(option) },
                 )
             },
         )
-        FilaAjustes(
-            titulo = stringResource(R.string.ajustes_borrar),
-            onClick = onPedirBorrado,
-            conFlecha = false,
-            colorTitulo = MaterialTheme.colorScheme.error,
+        SettingsRow(
+            title = stringResource(R.string.ajustes_borrar),
+            onClick = onRequestDeletion,
+            showChevron = false,
+            titleColor = MaterialTheme.colorScheme.error,
         )
-        TarjetaAcercaDe(version = version)
-        if (confirmarBorrado) {
+        AboutCard(version = version)
+        if (confirmDeletion) {
             AlertDialog(
-                onDismissRequest = onCancelarBorrado,
+                onDismissRequest = onCancelDeletion,
                 title = { Text(text = stringResource(R.string.ajustes_borrar_titulo)) },
                 text = { Text(text = stringResource(R.string.ajustes_borrar_mensaje)) },
                 confirmButton = {
-                    TextButton(onClick = onBorrarDatos) {
+                    TextButton(onClick = onClearData) {
                         Text(
                             text = stringResource(R.string.ajustes_borrar_confirmar),
                             color = MaterialTheme.colorScheme.error,
@@ -199,7 +199,7 @@ fun AjustesContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = onCancelarBorrado) {
+                    TextButton(onClick = onCancelDeletion) {
                         Text(text = stringResource(R.string.ajustes_cancelar))
                     }
                 },
@@ -208,17 +208,17 @@ fun AjustesContent(
     }
 }
 
-private data class OpcionAjuste(
-    val texto: String,
-    val seleccionada: Boolean,
+private data class SettingsOption(
+    val text: String,
+    val selected: Boolean,
     val onClick: () -> Unit,
 )
 
 @Composable
-private fun SeccionRadios(
-    titulo: String,
-    opciones: List<OpcionAjuste>,
-    subtitulo: String? = null,
+private fun RadioSection(
+    title: String,
+    options: List<SettingsOption>,
+    subtitle: String? = null,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -226,29 +226,29 @@ private fun SeccionRadios(
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)) {
             Text(
-                text = titulo,
+                text = title,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 style = MaterialTheme.typography.bodyLarge,
             )
-            if (subtitulo != null) {
+            if (subtitle != null) {
                 Text(
-                    text = subtitulo,
+                    text = subtitle,
                     modifier = Modifier.padding(horizontal = 12.dp),
                     color = Color.Gray,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
-            opciones.forEach { opcion ->
+            options.forEach { option ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(onClick = opcion.onClick)
+                        .clickable(onClick = option.onClick)
                         .padding(end = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
-                        selected = opcion.seleccionada,
-                        onClick = opcion.onClick,
+                        selected = option.selected,
+                        onClick = option.onClick,
                         colors = RadioButtonDefaults.colors(
                             selectedColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
                                 colorResource(R.color.azulfer_claro)
@@ -258,7 +258,7 @@ private fun SeccionRadios(
                         ),
                     )
                     Text(
-                        text = opcion.texto,
+                        text = option.text,
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -268,30 +268,30 @@ private fun SeccionRadios(
 }
 
 @Composable
-private fun textoTema(tema: TemaApp): String {
-    return when (tema) {
-        TemaApp.CLARO -> stringResource(R.string.tema_claro)
-        TemaApp.OSCURO -> stringResource(R.string.tema_oscuro)
-        TemaApp.SISTEMA -> stringResource(R.string.tema_sistema)
+private fun themeLabel(theme: AppTheme): String {
+    return when (theme) {
+        AppTheme.CLARO -> stringResource(R.string.tema_claro)
+        AppTheme.OSCURO -> stringResource(R.string.tema_oscuro)
+        AppTheme.SISTEMA -> stringResource(R.string.tema_sistema)
     }
 }
 
 @Composable
-private fun textoTamano(tamano: TamanoTexto): String {
-    return when (tamano) {
-        TamanoTexto.NORMAL -> stringResource(R.string.tamano_normal)
-        TamanoTexto.GRANDE -> stringResource(R.string.tamano_grande)
-        TamanoTexto.MUY_GRANDE -> stringResource(R.string.tamano_muy_grande)
+private fun textSizeLabel(size: TextSize): String {
+    return when (size) {
+        TextSize.NORMAL -> stringResource(R.string.tamano_normal)
+        TextSize.GRANDE -> stringResource(R.string.tamano_grande)
+        TextSize.MUY_GRANDE -> stringResource(R.string.tamano_muy_grande)
     }
 }
 
 @Composable
-private fun FilaAjustes(
-    titulo: String,
+private fun SettingsRow(
+    title: String,
     onClick: () -> Unit,
-    subtitulo: String? = null,
-    conFlecha: Boolean = true,
-    colorTitulo: Color = Color.Unspecified,
+    subtitle: String? = null,
+    showChevron: Boolean = true,
+    titleColor: Color = Color.Unspecified,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -310,19 +310,19 @@ private fun FilaAjustes(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = titulo,
-                    color = colorTitulo,
+                    text = title,
+                    color = titleColor,
                     style = MaterialTheme.typography.bodyLarge,
                 )
-                if (subtitulo != null) {
+                if (subtitle != null) {
                     Text(
-                        text = subtitulo,
+                        text = subtitle,
                         color = Color.Gray,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
-            if (conFlecha) {
+            if (showChevron) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
@@ -334,7 +334,7 @@ private fun FilaAjustes(
 }
 
 @Composable
-private fun TarjetaAcercaDe(version: String) {
+private fun AboutCard(version: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(30.dp),
@@ -376,7 +376,7 @@ private fun TarjetaAcercaDe(version: String) {
     }
 }
 
-private fun versionApp(context: Context): String {
+private fun appVersion(context: Context): String {
     val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         context.packageManager.getPackageInfo(
             context.packageName,
@@ -389,35 +389,35 @@ private fun versionApp(context: Context): String {
     return info.versionName.orEmpty()
 }
 
-private fun notificacionesActivas(context: Context): Boolean {
+private fun notificationsEnabled(context: Context): Boolean {
     return NotificationManagerCompat.from(context).areNotificationsEnabled()
 }
 
-private fun puedeVolverAPedirPermiso(context: Context): Boolean {
-    val activity = context.buscarActividad() ?: return false
+private fun canAskNotificationPermissionAgain(context: Context): Boolean {
+    val activity = context.findActivity() ?: return false
     return activity.shouldShowRequestPermissionRationale(
         android.Manifest.permission.POST_NOTIFICATIONS,
     )
 }
 
-private fun Context.buscarActividad(): Activity? {
-    var actual: Context = this
-    while (actual is ContextWrapper) {
-        if (actual is Activity) {
-            return actual
+private fun Context.findActivity(): Activity? {
+    var current: Context = this
+    while (current is ContextWrapper) {
+        if (current is Activity) {
+            return current
         }
-        actual = actual.baseContext
+        current = current.baseContext
     }
     return null
 }
 
-private fun abrirAjustesNotificaciones(context: Context) {
+private fun openNotificationSettings(context: Context) {
     val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        Intent(AndroidSettings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(AndroidSettings.EXTRA_APP_PACKAGE, context.packageName)
         }
     } else {
-        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        Intent(AndroidSettings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts("package", context.packageName, null)
         }
     }
@@ -426,20 +426,20 @@ private fun abrirAjustesNotificaciones(context: Context) {
 
 @Preview(showBackground = true)
 @Composable
-fun AjustesPreview() {
+fun SettingsPreview() {
     FERPantallasTheme {
-        AjustesContent(
-            avisosActivos = true,
-            tema = TemaApp.SISTEMA,
-            onTema = {},
-            tamanoTexto = TamanoTexto.NORMAL,
-            onTamanoTexto = {},
-            onSobreTi = {},
-            onNotificaciones = {},
-            onBorrarDatos = {},
-            confirmarBorrado = false,
-            onPedirBorrado = {},
-            onCancelarBorrado = {},
+        SettingsContent(
+            notificationsOn = true,
+            theme = AppTheme.SISTEMA,
+            onTheme = {},
+            textSize = TextSize.NORMAL,
+            onTextSize = {},
+            onAboutYou = {},
+            onNotifications = {},
+            onClearData = {},
+            confirmDeletion = false,
+            onRequestDeletion = {},
+            onCancelDeletion = {},
             version = "1.0",
         )
     }

@@ -22,7 +22,7 @@ import zaragoza.mateo.ferpantallas.R
 @Composable
 fun FERPantallasTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    escalaTexto: Float = 1f,
+    textScale: Float = 1f,
     content: @Composable () -> Unit,
 ) {
     val azulFer = colorResource(R.color.azulfer)
@@ -37,7 +37,7 @@ fun FERPantallasTheme(
         )
     }
     val view = LocalView.current
-    val activity = view.context.buscarActividad()
+    val activity = view.context.findActivity()
     if (!view.isInEditMode && activity != null) {
         SideEffect {
             val controller = WindowCompat.getInsetsController(activity.window, view)
@@ -50,12 +50,12 @@ fun FERPantallasTheme(
         colorScheme = colorScheme,
         typography = Typography,
     ) {
-        val densidad = LocalDensity.current
+        val density = LocalDensity.current
         CompositionLocalProvider(
             LocalContentColor provides colorScheme.onSurface,
             LocalDensity provides Density(
-                density = densidad.density,
-                fontScale = densidad.fontScale * escalaTexto,
+                density = density.density,
+                fontScale = density.fontScale * textScale,
             ),
         ) {
             content()
@@ -63,13 +63,13 @@ fun FERPantallasTheme(
     }
 }
 
-private fun Context.buscarActividad(): Activity? {
-    var actual: Context = this
-    while (actual is ContextWrapper) {
-        if (actual is Activity) {
-            return actual
+private fun Context.findActivity(): Activity? {
+    var current: Context = this
+    while (current is ContextWrapper) {
+        if (current is Activity) {
+            return current
         }
-        actual = actual.baseContext
+        current = current.baseContext
     }
     return null
 }

@@ -38,37 +38,37 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import zaragoza.mateo.ferpantallas.R
-import zaragoza.mateo.ferpantallas.modelos.CategoriaAviso
-import zaragoza.mateo.ferpantallas.modelos.NivelEducativo
-import zaragoza.mateo.ferpantallas.modelos.PerfilBeca
+import zaragoza.mateo.ferpantallas.modelos.NoticeCategory
+import zaragoza.mateo.ferpantallas.modelos.EducationLevel
+import zaragoza.mateo.ferpantallas.modelos.ScholarshipProfile
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
-import zaragoza.mateo.ferpantallas.viewmodels.SobreTiViewModel
+import zaragoza.mateo.ferpantallas.viewmodels.AboutYouViewModel
 
 @Composable
-fun SobreTi(
+fun AboutYou(
     onBack: () -> Unit,
-    viewModel: SobreTiViewModel = viewModel(),
+    viewModel: AboutYouViewModel = viewModel(),
 ) {
-    SobreTiContent(
-        nivel = viewModel.nivel,
-        perfil = viewModel.perfil,
-        avisos = viewModel.avisos,
+    AboutYouContent(
+        level = viewModel.level,
+        profile = viewModel.profile,
+        notices = viewModel.notices,
         onBack = onBack,
-        onNivel = viewModel::onNivelSeleccionado,
-        onPerfil = viewModel::onPerfilSeleccionado,
-        onAviso = viewModel::onAvisoCambiado,
+        onLevel = viewModel::onLevelSelected,
+        onProfile = viewModel::onProfileSelected,
+        onNotice = viewModel::onNoticeToggled,
     )
 }
 
 @Composable
-fun SobreTiContent(
-    nivel: NivelEducativo,
-    perfil: PerfilBeca,
-    avisos: Set<CategoriaAviso>,
+fun AboutYouContent(
+    level: EducationLevel,
+    profile: ScholarshipProfile,
+    notices: Set<NoticeCategory>,
     onBack: () -> Unit,
-    onNivel: (NivelEducativo) -> Unit,
-    onPerfil: (PerfilBeca) -> Unit,
-    onAviso: (CategoriaAviso) -> Unit,
+    onLevel: (EducationLevel) -> Unit,
+    onProfile: (ScholarshipProfile) -> Unit,
+    onNotice: (NoticeCategory) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -103,34 +103,34 @@ fun SobreTiContent(
                 .padding(horizontal = 24.dp, vertical = 28.dp),
             verticalArrangement = Arrangement.spacedBy(28.dp),
         ) {
-            SeccionOpcion(
-                titulo = stringResource(R.string.sobre_ti_nivel),
-                opciones = NivelEducativo.entries.map { opcion ->
-                    OpcionSobreTi(
-                        texto = textoNivel(opcion),
-                        seleccionada = opcion == nivel,
-                        onClick = { onNivel(opcion) },
+            OptionSection(
+                title = stringResource(R.string.sobre_ti_nivel),
+                options = EducationLevel.entries.map { option ->
+                    AboutYouOption(
+                        text = levelLabel(option),
+                        selected = option == level,
+                        onClick = { onLevel(option) },
                     )
                 },
             )
-            SeccionOpcion(
-                titulo = stringResource(R.string.sobre_ti_perfil),
-                opciones = PerfilBeca.entries.map { opcion ->
-                    OpcionSobreTi(
-                        texto = textoPerfil(opcion),
-                        seleccionada = opcion == perfil,
-                        onClick = { onPerfil(opcion) },
+            OptionSection(
+                title = stringResource(R.string.sobre_ti_perfil),
+                options = ScholarshipProfile.entries.map { option ->
+                    AboutYouOption(
+                        text = profileLabel(option),
+                        selected = option == profile,
+                        onClick = { onProfile(option) },
                     )
                 },
             )
-            SeccionOpcion(
-                titulo = stringResource(R.string.sobre_ti_avisos),
-                opciones = CategoriaAviso.entries.map { opcion ->
-                    OpcionSobreTi(
-                        texto = textoAviso(opcion),
-                        seleccionada = opcion in avisos,
-                        onClick = { onAviso(opcion) },
-                        varias = true,
+            OptionSection(
+                title = stringResource(R.string.sobre_ti_avisos),
+                options = NoticeCategory.entries.map { option ->
+                    AboutYouOption(
+                        text = noticeLabel(option),
+                        selected = option in notices,
+                        onClick = { onNotice(option) },
+                        multiSelect = true,
                     )
                 },
             )
@@ -139,66 +139,66 @@ fun SobreTiContent(
 }
 
 @Composable
-private fun SeccionOpcion(
-    titulo: String,
-    opciones: List<OpcionSobreTi>,
+private fun OptionSection(
+    title: String,
+    options: List<AboutYouOption>,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            text = titulo,
+            text = title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
         )
         HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-        opciones.forEach { opcion ->
+        options.forEach { option ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = opcion.onClick)
+                    .clickable(onClick = option.onClick)
                     .semantics {
-                        role = if (opcion.varias) Role.Checkbox else Role.RadioButton
-                        selected = opcion.seleccionada
+                        role = if (option.multiSelect) Role.Checkbox else Role.RadioButton
+                        selected = option.selected
                     }
                     .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = opcion.texto,
+                    text = option.text,
                     style = MaterialTheme.typography.bodyLarge,
                 )
-                CirculoOpcion(seleccionado = opcion.seleccionada)
+                OptionCircle(isSelected = option.selected)
             }
         }
     }
 }
 
-private data class OpcionSobreTi(
-    val texto: String,
-    val seleccionada: Boolean,
+private data class AboutYouOption(
+    val text: String,
+    val selected: Boolean,
     val onClick: () -> Unit,
-    val varias: Boolean = false,
+    val multiSelect: Boolean = false,
 )
 
 @Composable
-private fun CirculoOpcion(seleccionado: Boolean) {
-    val marca = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
+private fun OptionCircle(isSelected: Boolean) {
+    val markColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
         colorResource(R.color.azulfer_claro)
     } else {
         colorResource(R.color.azulfer)
     }
-    if (seleccionado) {
+    if (isSelected) {
         Box(
             modifier = Modifier
                 .size(22.dp)
-                .border(width = 2.dp, color = marca, shape = CircleShape),
+                .border(width = 2.dp, color = markColor, shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Box(
                 modifier = Modifier
                     .size(12.dp)
                     .clip(CircleShape)
-                    .background(marca),
+                    .background(markColor),
             )
         }
     } else {
@@ -212,48 +212,48 @@ private fun CirculoOpcion(seleccionado: Boolean) {
 }
 
 @Composable
-private fun textoNivel(nivel: NivelEducativo): String {
-    return when (nivel) {
-        NivelEducativo.PREPARATORIA -> stringResource(R.string.nivel_preparatoria)
-        NivelEducativo.UNIVERSIDAD -> stringResource(R.string.nivel_universidad)
-        NivelEducativo.POSGRADO -> stringResource(R.string.nivel_posgrado)
+private fun levelLabel(level: EducationLevel): String {
+    return when (level) {
+        EducationLevel.PREPARATORIA -> stringResource(R.string.nivel_preparatoria)
+        EducationLevel.UNIVERSIDAD -> stringResource(R.string.nivel_universidad)
+        EducationLevel.POSGRADO -> stringResource(R.string.nivel_posgrado)
     }
 }
 
 @Composable
-private fun textoPerfil(perfil: PerfilBeca): String {
-    return when (perfil) {
-        PerfilBeca.ASPIRANTE -> stringResource(R.string.perfil_aspirante)
-        PerfilBeca.BECADO -> stringResource(R.string.perfil_becado)
+private fun profileLabel(profile: ScholarshipProfile): String {
+    return when (profile) {
+        ScholarshipProfile.ASPIRANTE -> stringResource(R.string.perfil_aspirante)
+        ScholarshipProfile.BECADO -> stringResource(R.string.perfil_becado)
     }
 }
 
 @Composable
-private fun textoAviso(aviso: CategoriaAviso): String {
-    return when (aviso) {
-        CategoriaAviso.CONVOCATORIAS -> stringResource(R.string.aviso_convocatorias)
-        CategoriaAviso.RENOVACION -> stringResource(R.string.aviso_renovacion)
-        CategoriaAviso.EVENTOS_SOCIALES -> stringResource(R.string.aviso_eventos)
-        CategoriaAviso.ANUNCIOS -> stringResource(R.string.aviso_anuncios)
+private fun noticeLabel(notice: NoticeCategory): String {
+    return when (notice) {
+        NoticeCategory.CONVOCATORIAS -> stringResource(R.string.aviso_convocatorias)
+        NoticeCategory.RENOVACION -> stringResource(R.string.aviso_renovacion)
+        NoticeCategory.EVENTOS_SOCIALES -> stringResource(R.string.aviso_eventos)
+        NoticeCategory.ANUNCIOS -> stringResource(R.string.aviso_anuncios)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun SobreTiPreview() {
+fun AboutYouPreview() {
     FERPantallasTheme {
-        SobreTiContent(
-            nivel = NivelEducativo.UNIVERSIDAD,
-            perfil = PerfilBeca.BECADO,
-            avisos = setOf(
-                CategoriaAviso.RENOVACION,
-                CategoriaAviso.EVENTOS_SOCIALES,
-                CategoriaAviso.ANUNCIOS,
+        AboutYouContent(
+            level = EducationLevel.UNIVERSIDAD,
+            profile = ScholarshipProfile.BECADO,
+            notices = setOf(
+                NoticeCategory.RENOVACION,
+                NoticeCategory.EVENTOS_SOCIALES,
+                NoticeCategory.ANUNCIOS,
             ),
             onBack = {},
-            onNivel = {},
-            onPerfil = {},
-            onAviso = {},
+            onLevel = {},
+            onProfile = {},
+            onNotice = {},
         )
     }
 }

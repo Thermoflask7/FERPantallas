@@ -10,27 +10,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import zaragoza.mateo.ferpantallas.modelos.TemaApp
+import zaragoza.mateo.ferpantallas.modelos.AppTheme
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
-import zaragoza.mateo.ferpantallas.viewmodels.AjustesViewModel
-import zaragoza.mateo.ferpantallas.vistas.MarcoApp
+import zaragoza.mateo.ferpantallas.viewmodels.SettingsViewModel
+import zaragoza.mateo.ferpantallas.vistas.AppFrame
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val ajustesViewModel: AjustesViewModel = viewModel()
-            val oscuro = when (ajustesViewModel.tema) {
-                TemaApp.CLARO -> false
-                TemaApp.OSCURO -> true
-                TemaApp.SISTEMA -> isSystemInDarkTheme()
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val dark = when (settingsViewModel.theme) {
+                AppTheme.CLARO -> false
+                AppTheme.OSCURO -> true
+                AppTheme.SISTEMA -> isSystemInDarkTheme()
             }
             FERPantallasTheme(
-                darkTheme = oscuro,
-                escalaTexto = ajustesViewModel.tamanoTexto.escala,
+                darkTheme = dark,
+                textScale = settingsViewModel.textSize.scale,
             ) {
-                MarcoApp()
+                AppFrame()
             }
         }
     }

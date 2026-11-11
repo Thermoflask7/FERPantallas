@@ -63,19 +63,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import zaragoza.mateo.ferpantallas.R
-import zaragoza.mateo.ferpantallas.modelos.NivelEducativo
-import zaragoza.mateo.ferpantallas.modelos.PerfilBeca
+import zaragoza.mateo.ferpantallas.modelos.EducationLevel
+import zaragoza.mateo.ferpantallas.modelos.ScholarshipProfile
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
 
-private val AzulArriba = Color(0xFF1F5796)
-private val AzulMedio = Color(0xFF2A4C9E)
+private val TopBlue = Color(0xFF1F5796)
+private val MidBlue = Color(0xFF2A4C9E)
 private val Indigo = Color(0xFF3A37A6)
-private val AzulClaro = Color(0xFF3A5EBC)
-private val AzulProfundo = Color(0xFF2A4596)
-private val TextoMarino = Color(0xFF1E2C7C)
-private val Subtitulo = Color(0xFFC5CCF2)
+private val LightBlue = Color(0xFF3A5EBC)
+private val DeepBlue = Color(0xFF2A4596)
+private val NavyText = Color(0xFF1E2C7C)
+private val SubtitleColor = Color(0xFFC5CCF2)
 
-private const val TOTAL_PASOS = 2
+private const val TOTAL_STEPS = 2
 
 private val Montserrat = FontFamily(
     Font(R.font.montserrat_regular, FontWeight.Normal),
@@ -87,18 +87,18 @@ private val CormorantSC = FontFamily(
 )
 
 @Composable
-fun Bienvenida(
-    onContinuar: (PerfilBeca, NivelEducativo) -> Unit,
+fun Welcome(
+    onContinue: (ScholarshipProfile, EducationLevel) -> Unit,
 ) {
-    var paso by rememberSaveable { mutableIntStateOf(0) }
-    var perfilNombre by rememberSaveable { mutableStateOf("") }
-    var nivelNombre by rememberSaveable { mutableStateOf("") }
-    val perfil = PerfilBeca.entries.firstOrNull { it.name == perfilNombre }
-    val nivel = NivelEducativo.entries.firstOrNull { it.name == nivelNombre }
+    var step by rememberSaveable { mutableIntStateOf(0) }
+    var profileName by rememberSaveable { mutableStateOf("") }
+    var levelName by rememberSaveable { mutableStateOf("") }
+    val profile = ScholarshipProfile.entries.firstOrNull { it.name == profileName }
+    val level = EducationLevel.entries.firstOrNull { it.name == levelName }
 
-    BackHandler(enabled = paso > 0) { paso -= 1 }
+    BackHandler(enabled = step > 0) { step -= 1 }
 
-    FondoBienvenida {
+    WelcomeBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -107,7 +107,7 @@ fun Bienvenida(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(32.dp))
-            LogoBienvenida()
+            WelcomeLogo()
             Spacer(Modifier.height(28.dp))
             Text(
                 text = stringResource(R.string.bienvenida_titulo),
@@ -126,12 +126,12 @@ fun Bienvenida(
                 style = TextStyle(
                     fontFamily = Montserrat,
                     fontSize = 17.sp,
-                    color = Subtitulo,
+                    color = SubtitleColor,
                     letterSpacing = 0.3.sp,
                 ),
             )
             Spacer(Modifier.height(24.dp))
-            IndicadorPasos(total = TOTAL_PASOS, actual = paso)
+            StepIndicator(total = TOTAL_STEPS, current = step)
             Spacer(Modifier.height(24.dp))
             Column(
                 modifier = Modifier
@@ -141,34 +141,34 @@ fun Bienvenida(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 AnimatedContent(
-                    targetState = paso,
+                    targetState = step,
                     modifier = Modifier.fillMaxWidth(),
                     transitionSpec = {
-                        val direccion = if (targetState > initialState) 1 else -1
-                        (slideInHorizontally { it * direccion / 3 } + fadeIn()) togetherWith
-                                (slideOutHorizontally { -it * direccion / 3 } + fadeOut())
+                        val direction = if (targetState > initialState) 1 else -1
+                        (slideInHorizontally { it * direction / 3 } + fadeIn()) togetherWith
+                                (slideOutHorizontally { -it * direction / 3 } + fadeOut())
                     },
                     label = "pasoBienvenida",
-                ) { actual ->
-                    if (actual == 0) {
-                        PreguntaOpciones(
-                            pregunta = stringResource(R.string.bienvenida_pregunta_perfil),
-                            opciones = PerfilBeca.entries.map { opcion ->
-                                OpcionBienvenida(
-                                    texto = textoPerfil(opcion),
-                                    seleccionada = opcion == perfil,
-                                    onClick = { perfilNombre = opcion.name },
+                ) { current ->
+                    if (current == 0) {
+                        OptionQuestion(
+                            question = stringResource(R.string.bienvenida_pregunta_perfil),
+                            options = ScholarshipProfile.entries.map { option ->
+                                WelcomeOption(
+                                    text = profileLabel(option),
+                                    selected = option == profile,
+                                    onClick = { profileName = option.name },
                                 )
                             },
                         )
                     } else {
-                        PreguntaOpciones(
-                            pregunta = stringResource(R.string.bienvenida_pregunta_nivel),
-                            opciones = NivelEducativo.entries.map { opcion ->
-                                OpcionBienvenida(
-                                    texto = textoNivel(opcion),
-                                    seleccionada = opcion == nivel,
-                                    onClick = { nivelNombre = opcion.name },
+                        OptionQuestion(
+                            question = stringResource(R.string.bienvenida_pregunta_nivel),
+                            options = EducationLevel.entries.map { option ->
+                                WelcomeOption(
+                                    text = levelLabel(option),
+                                    selected = option == level,
+                                    onClick = { levelName = option.name },
                                 )
                             },
                         )
@@ -176,16 +176,16 @@ fun Bienvenida(
                 }
             }
             Spacer(Modifier.height(16.dp))
-            val puedeContinuar = if (paso == 0) perfil != null else nivel != null
-            BotonContinuar(
-                habilitado = puedeContinuar,
+            val canContinue = if (step == 0) profile != null else level != null
+            ContinueButton(
+                enabled = canContinue,
                 onClick = {
-                    val perfilElegido = perfil
-                    val nivelElegido = nivel
-                    if (paso == 0) {
-                        paso = 1
-                    } else if (perfilElegido != null && nivelElegido != null) {
-                        onContinuar(perfilElegido, nivelElegido)
+                    val chosenProfile = profile
+                    val chosenLevel = level
+                    if (step == 0) {
+                        step = 1
+                    } else if (chosenProfile != null && chosenLevel != null) {
+                        onContinue(chosenProfile, chosenLevel)
                     }
                 },
             )
@@ -195,7 +195,7 @@ fun Bienvenida(
 }
 
 @Composable
-private fun FondoBienvenida(
+private fun WelcomeBackground(
     content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
@@ -203,8 +203,8 @@ private fun FondoBienvenida(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0f to AzulArriba,
-                    0.35f to AzulMedio,
+                    0f to TopBlue,
+                    0.35f to MidBlue,
                     0.65f to Indigo,
                     1f to Indigo,
                 ),
@@ -212,14 +212,14 @@ private fun FondoBienvenida(
             .drawBehind {
                 drawRect(
                     Brush.radialGradient(
-                        colors = listOf(AzulClaro, Color.Transparent),
+                        colors = listOf(LightBlue, Color.Transparent),
                         center = Offset(size.width * 0.95f, size.height * 0.5f),
                         radius = size.width * 0.9f,
                     ),
                 )
                 drawRect(
                     Brush.radialGradient(
-                        colors = listOf(AzulProfundo, Color.Transparent),
+                        colors = listOf(DeepBlue, Color.Transparent),
                         center = Offset(size.width * 0.85f, size.height * 0.98f),
                         radius = size.width * 0.6f,
                     ),
@@ -241,9 +241,9 @@ private fun FondoBienvenida(
 }
 
 @Composable
-private fun LogoBienvenida() {
-    val linea = Color.White.copy(alpha = 0.7f)
-    val estilo = TextStyle(
+private fun WelcomeLogo() {
+    val line = Color.White.copy(alpha = 0.7f)
+    val style = TextStyle(
         fontFamily = CormorantSC,
         fontWeight = FontWeight.Medium,
         fontSize = 34.sp,
@@ -252,38 +252,38 @@ private fun LogoBienvenida() {
         textAlign = TextAlign.Center,
     )
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(Modifier.width(72.dp).height(1.dp).background(linea))
+        Box(Modifier.width(72.dp).height(1.dp).background(line))
         Spacer(Modifier.height(8.dp))
-        Text(text = stringResource(R.string.bienvenida_logo_fundacion), style = estilo)
-        Text(text = stringResource(R.string.bienvenida_logo_esposos), style = estilo)
+        Text(text = stringResource(R.string.bienvenida_logo_fundacion), style = style)
+        Text(text = stringResource(R.string.bienvenida_logo_esposos), style = style)
         Text(
             text = stringResource(R.string.bienvenida_logo_rodriguez),
-            style = estilo.copy(fontSize = 38.sp),
+            style = style.copy(fontSize = 38.sp),
         )
         Spacer(Modifier.height(8.dp))
-        Box(Modifier.width(72.dp).height(1.dp).background(linea))
+        Box(Modifier.width(72.dp).height(1.dp).background(line))
     }
 }
 
 @Composable
-private fun IndicadorPasos(total: Int, actual: Int) {
+private fun StepIndicator(total: Int, current: Int) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        repeat(total) { indice ->
-            val ancho by animateDpAsState(
-                targetValue = if (indice == actual) 28.dp else 8.dp,
+        repeat(total) { index ->
+            val width by animateDpAsState(
+                targetValue = if (index == current) 28.dp else 8.dp,
                 label = "anchoPaso",
             )
             val color by animateColorAsState(
-                targetValue = if (indice <= actual) Color.White else Color.White.copy(alpha = 0.3f),
+                targetValue = if (index <= current) Color.White else Color.White.copy(alpha = 0.3f),
                 label = "colorPaso",
             )
             Box(
                 Modifier
                     .height(8.dp)
-                    .width(ancho)
+                    .width(width)
                     .clip(CircleShape)
                     .background(color),
             )
@@ -291,16 +291,16 @@ private fun IndicadorPasos(total: Int, actual: Int) {
     }
 }
 
-private data class OpcionBienvenida(
-    val texto: String,
-    val seleccionada: Boolean,
+private data class WelcomeOption(
+    val text: String,
+    val selected: Boolean,
     val onClick: () -> Unit,
 )
 
 @Composable
-private fun PreguntaOpciones(
-    pregunta: String,
-    opciones: List<OpcionBienvenida>,
+private fun OptionQuestion(
+    question: String,
+    options: List<WelcomeOption>,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -308,7 +308,7 @@ private fun PreguntaOpciones(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = pregunta,
+            text = question,
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontFamily = Montserrat,
@@ -318,45 +318,45 @@ private fun PreguntaOpciones(
             ),
             modifier = Modifier.padding(bottom = 6.dp),
         )
-        opciones.forEach { opcion ->
-            PastillaOpcion(
-                texto = opcion.texto,
-                seleccionada = opcion.seleccionada,
-                onClick = opcion.onClick,
+        options.forEach { option ->
+            OptionPill(
+                text = option.text,
+                selected = option.selected,
+                onClick = option.onClick,
             )
         }
     }
 }
 
 @Composable
-private fun PastillaOpcion(
-    texto: String,
-    seleccionada: Boolean,
+private fun OptionPill(
+    text: String,
+    selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val fondo by animateColorAsState(
-        targetValue = if (seleccionada) Color.White else Color.White.copy(alpha = 0.12f),
+    val backgroundColor by animateColorAsState(
+        targetValue = if (selected) Color.White else Color.White.copy(alpha = 0.12f),
         label = "fondoOpcion",
     )
-    val colorTexto by animateColorAsState(
-        targetValue = if (seleccionada) TextoMarino else Color.White,
+    val textColor by animateColorAsState(
+        targetValue = if (selected) NavyText else Color.White,
         label = "textoOpcion",
     )
-    val colorBorde by animateColorAsState(
-        targetValue = if (seleccionada) Color.White else Color.White.copy(alpha = 0.35f),
+    val borderColor by animateColorAsState(
+        targetValue = if (selected) Color.White else Color.White.copy(alpha = 0.35f),
         label = "bordeOpcion",
     )
-    val forma = RoundedCornerShape(50)
+    val shape = RoundedCornerShape(50)
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(52.dp)
-            .clip(forma)
-            .background(fondo)
-            .border(1.dp, colorBorde, forma)
+            .clip(shape)
+            .background(backgroundColor)
+            .border(1.dp, borderColor, shape)
             .selectable(
-                selected = seleccionada,
+                selected = selected,
                 role = Role.RadioButton,
                 onClick = onClick,
             )
@@ -364,17 +364,17 @@ private fun PastillaOpcion(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = texto,
+            text = text,
             style = TextStyle(
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.Medium,
                 fontSize = 17.sp,
                 letterSpacing = 0.4.sp,
-                color = colorTexto,
+                color = textColor,
             ),
         )
         AnimatedVisibility(
-            visible = seleccionada,
+            visible = selected,
             modifier = Modifier.align(Alignment.CenterEnd),
             enter = fadeIn(),
             exit = fadeOut(),
@@ -382,7 +382,7 @@ private fun PastillaOpcion(
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = null,
-                tint = TextoMarino,
+                tint = NavyText,
                 modifier = Modifier.size(20.dp),
             )
         }
@@ -390,12 +390,12 @@ private fun PastillaOpcion(
 }
 
 @Composable
-private fun BotonContinuar(
-    habilitado: Boolean,
+private fun ContinueButton(
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
     val alpha by animateFloatAsState(
-        targetValue = if (habilitado) 1f else 0.4f,
+        targetValue = if (enabled) 1f else 0.4f,
         label = "alphaContinuar",
     )
     Row(
@@ -407,7 +407,7 @@ private fun BotonContinuar(
             .height(54.dp)
             .clip(CircleShape)
             .background(Color.White)
-            .clickable(enabled = habilitado, role = Role.Button, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
     ) {
         Text(
             text = stringResource(R.string.bienvenida_continuar),
@@ -415,40 +415,40 @@ private fun BotonContinuar(
                 fontFamily = Montserrat,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
-                color = TextoMarino,
+                color = NavyText,
                 letterSpacing = 0.3.sp,
             ),
         )
         Spacer(Modifier.width(12.dp))
-        FlechaDerecha(color = TextoMarino, modifier = Modifier.size(18.dp))
+        RightArrow(color = NavyText, modifier = Modifier.size(18.dp))
     }
 }
 
 @Composable
-private fun FlechaDerecha(color: Color, modifier: Modifier = Modifier) {
+private fun RightArrow(color: Color, modifier: Modifier = Modifier) {
     Canvas(modifier) {
         val stroke = size.width * 0.14f
-        val medio = size.height / 2
-        val punta = size.width * 0.92f
-        val cabeza = size.width * 0.4f
+        val middle = size.height / 2
+        val tip = size.width * 0.92f
+        val head = size.width * 0.4f
         drawLine(
             color,
-            Offset(size.width * 0.08f, medio),
-            Offset(punta, medio),
+            Offset(size.width * 0.08f, middle),
+            Offset(tip, middle),
             stroke,
             StrokeCap.Round,
         )
         drawLine(
             color,
-            Offset(punta - cabeza, medio - cabeza),
-            Offset(punta, medio),
+            Offset(tip - head, middle - head),
+            Offset(tip, middle),
             stroke,
             StrokeCap.Round,
         )
         drawLine(
             color,
-            Offset(punta - cabeza, medio + cabeza),
-            Offset(punta, medio),
+            Offset(tip - head, middle + head),
+            Offset(tip, middle),
             stroke,
             StrokeCap.Round,
         )
@@ -456,26 +456,26 @@ private fun FlechaDerecha(color: Color, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun textoPerfil(perfil: PerfilBeca): String {
-    return when (perfil) {
-        PerfilBeca.ASPIRANTE -> stringResource(R.string.perfil_aspirante)
-        PerfilBeca.BECADO -> stringResource(R.string.perfil_becado)
+private fun profileLabel(profile: ScholarshipProfile): String {
+    return when (profile) {
+        ScholarshipProfile.ASPIRANTE -> stringResource(R.string.perfil_aspirante)
+        ScholarshipProfile.BECADO -> stringResource(R.string.perfil_becado)
     }
 }
 
 @Composable
-private fun textoNivel(nivel: NivelEducativo): String {
-    return when (nivel) {
-        NivelEducativo.PREPARATORIA -> stringResource(R.string.nivel_preparatoria)
-        NivelEducativo.UNIVERSIDAD -> stringResource(R.string.nivel_universidad)
-        NivelEducativo.POSGRADO -> stringResource(R.string.nivel_posgrado)
+private fun levelLabel(level: EducationLevel): String {
+    return when (level) {
+        EducationLevel.PREPARATORIA -> stringResource(R.string.nivel_preparatoria)
+        EducationLevel.UNIVERSIDAD -> stringResource(R.string.nivel_universidad)
+        EducationLevel.POSGRADO -> stringResource(R.string.nivel_posgrado)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun BienvenidaPreview() {
+private fun WelcomePreview() {
     FERPantallasTheme {
-        Bienvenida(onContinuar = { _, _ -> })
+        Welcome(onContinue = { _, _ -> })
     }
 }

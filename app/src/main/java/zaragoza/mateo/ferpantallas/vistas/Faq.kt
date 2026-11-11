@@ -44,8 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import zaragoza.mateo.ferpantallas.R
-import zaragoza.mateo.ferpantallas.modelos.CategoriaFaq
-import zaragoza.mateo.ferpantallas.modelos.PreguntaVisible
+import zaragoza.mateo.ferpantallas.modelos.FaqCategory
+import zaragoza.mateo.ferpantallas.modelos.VisibleQuestion
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
 import zaragoza.mateo.ferpantallas.viewmodels.FaqViewModel
 
@@ -54,25 +54,25 @@ fun Faq(
     viewModel: FaqViewModel = viewModel(),
 ) {
     FaqContent(
-        preguntas = viewModel.preguntasFiltradas,
+        questions = viewModel.filteredQuestions,
         selectedFilter = viewModel.selectedFilter,
         query = viewModel.query,
         onFilterSelected = viewModel::onFilterSelected,
         onQueryChange = viewModel::onQueryChange,
-        selectedPreguntaId = viewModel.selectedPreguntaId,
-        onPreguntaClick = viewModel::onPreguntaClick,
+        selectedQuestionId = viewModel.selectedQuestionId,
+        onQuestionClick = viewModel::onQuestionClick,
     )
 }
 
 @Composable
 fun FaqContent(
-    preguntas: List<PreguntaVisible>,
-    selectedFilter: CategoriaFaq,
+    questions: List<VisibleQuestion>,
+    selectedFilter: FaqCategory,
     query: String,
-    onFilterSelected: (CategoriaFaq) -> Unit,
+    onFilterSelected: (FaqCategory) -> Unit,
     onQueryChange: (String) -> Unit,
-    selectedPreguntaId: Int?,
-    onPreguntaClick: (Int) -> Unit,
+    selectedQuestionId: Int?,
+    onQuestionClick: (Int) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -102,22 +102,22 @@ fun FaqContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                FiltroFaqChip(
-                    texto = stringResource(R.string.filtro_todas),
-                    selected = selectedFilter == CategoriaFaq.TODAS,
-                    onClick = { onFilterSelected(CategoriaFaq.TODAS) },
+                FaqFilterChip(
+                    text = stringResource(R.string.filtro_todas),
+                    selected = selectedFilter == FaqCategory.TODAS,
+                    onClick = { onFilterSelected(FaqCategory.TODAS) },
                     modifier = Modifier.weight(1f),
                 )
-                FiltroFaqChip(
-                    texto = stringResource(R.string.filtro_aspirantes),
-                    selected = selectedFilter == CategoriaFaq.ASPIRANTES,
-                    onClick = { onFilterSelected(CategoriaFaq.ASPIRANTES) },
+                FaqFilterChip(
+                    text = stringResource(R.string.filtro_aspirantes),
+                    selected = selectedFilter == FaqCategory.ASPIRANTES,
+                    onClick = { onFilterSelected(FaqCategory.ASPIRANTES) },
                     modifier = Modifier.weight(1f),
                 )
-                FiltroFaqChip(
-                    texto = stringResource(R.string.filtro_becarios),
-                    selected = selectedFilter == CategoriaFaq.BECARIOS,
-                    onClick = { onFilterSelected(CategoriaFaq.BECARIOS) },
+                FaqFilterChip(
+                    text = stringResource(R.string.filtro_becarios),
+                    selected = selectedFilter == FaqCategory.BECARIOS,
+                    onClick = { onFilterSelected(FaqCategory.BECARIOS) },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -135,13 +135,13 @@ fun FaqContent(
                 shape = RoundedCornerShape(30.dp),
             ) {
                 Column {
-                    preguntas.forEachIndexed { index, pregunta ->
-                        PreguntaItem(
-                            pregunta = pregunta,
-                            expanded = pregunta.id == selectedPreguntaId,
-                            onClick = { onPreguntaClick(pregunta.id) },
+                    questions.forEachIndexed { index, question ->
+                        QuestionRow(
+                            question = question,
+                            expanded = question.id == selectedQuestionId,
+                            onClick = { onQuestionClick(question.id) },
                         )
-                        if (index < preguntas.lastIndex) {
+                        if (index < questions.lastIndex) {
                             HorizontalDivider(color = Color.Gray, thickness = 1.dp)
                         }
                     }
@@ -194,8 +194,8 @@ fun FaqContent(
 }
 
 @Composable
-private fun FiltroFaqChip(
-    texto: String,
+private fun FaqFilterChip(
+    text: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -205,7 +205,7 @@ private fun FiltroFaqChip(
         onClick = onClick,
         label = {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(texto)
+                Text(text)
             }
         },
         modifier = modifier,
@@ -220,8 +220,8 @@ private fun FiltroFaqChip(
 }
 
 @Composable
-fun PreguntaItem(
-    pregunta: PreguntaVisible,
+fun QuestionRow(
+    question: VisibleQuestion,
     expanded: Boolean,
     onClick: () -> Unit,
 ) {
@@ -240,7 +240,7 @@ fun PreguntaItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = pregunta.text,
+                text = question.text,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyLarge,
             )
@@ -259,7 +259,7 @@ fun PreguntaItem(
         }
         if (expanded) {
             Text(
-                text = pregunta.answer,
+                text = question.answer,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
@@ -280,24 +280,24 @@ fun PreguntaItem(
 fun FaqPreview() {
     FERPantallasTheme {
         FaqContent(
-            preguntas = listOf(
-                PreguntaVisible(
+            questions = listOf(
+                VisibleQuestion(
                     1,
                     stringResource(R.string.faq_q_niveles),
                     stringResource(R.string.faq_a_niveles),
                 ),
-                PreguntaVisible(
+                VisibleQuestion(
                     2,
                     stringResource(R.string.faq_q_solicitar),
                     stringResource(R.string.faq_a_solicitar),
                 ),
             ),
-            selectedFilter = CategoriaFaq.TODAS,
+            selectedFilter = FaqCategory.TODAS,
             query = "",
             onFilterSelected = {},
             onQueryChange = {},
-            selectedPreguntaId = 1,
-            onPreguntaClick = {},
+            selectedQuestionId = 1,
+            onQuestionClick = {},
         )
     }
 }

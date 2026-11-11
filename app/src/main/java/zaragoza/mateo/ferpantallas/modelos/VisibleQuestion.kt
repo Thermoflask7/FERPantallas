@@ -1,6 +1,6 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-data class PreguntaVisible(
+data class VisibleQuestion(
     val id: Int,
     val text: String,
     val answer: String,

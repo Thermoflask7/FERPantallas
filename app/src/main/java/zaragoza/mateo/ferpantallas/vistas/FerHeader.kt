@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import zaragoza.mateo.ferpantallas.R
 
 @Composable
-fun EncabezadoFer() {
+fun FerHeader() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RectangleShape,
