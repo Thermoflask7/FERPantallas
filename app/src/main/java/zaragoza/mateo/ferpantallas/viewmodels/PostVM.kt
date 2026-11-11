@@ -48,9 +48,9 @@ class PostVM(application: Application) : AndroidViewModel(application) {
     fun refresh() {
         if (_isLoading.value) return
 
+        _isLoading.value = true
+        _error.value = null
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
             try {
                 _posts.value = api.getPosts().data.orEmpty()
                     .mapNotNull { it.toModel() }

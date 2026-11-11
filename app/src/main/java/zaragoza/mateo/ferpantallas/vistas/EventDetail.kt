@@ -82,10 +82,17 @@ fun EventDetailScreen(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val events by viewModel.events.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
     val event = events.firstOrNull { it.id == eventId }
 
-    if (event == null) {
-        NotFoundMessage(text = stringResource(R.string.event_not_found), onBack = onBack)
+    if (event == null && isLoading) {
+        LoadingMessage(onBack = onBack)
+    } else if (event == null) {
+        NotFoundMessage(
+            text = error ?: stringResource(R.string.event_not_found),
+            onBack = onBack,
+        )
     } else {
         EventDetailContent(
             event = event,
@@ -102,7 +109,7 @@ fun EventDetailScreen(
                     Toast.LENGTH_SHORT,
                 ).show()
             },
-            onRegisterClick = { uriHandler.openSafely(event.registerLink) }
+            onRegisterClick = { uriHandler.openSafely(context, event.registerLink) }
         )
     }
 }

@@ -7,5 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="azulfer">#1A3989</color>
+    <color name="azulfer_claro">#8EA2D6</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -121,6 +122,7 @@ fun MainFeed(
             .filter { it.visibleTo(profile) && it.matches(query) }
     }
     val error = postsError ?: eventsError
+    val loading = postsLoading || eventsLoading
 
     Column(modifier = modifier.fillMaxSize()) {
         SearchField(
@@ -138,7 +140,7 @@ fun MainFeed(
         }
 
         PullToRefreshBox(
-            isRefreshing = postsLoading || eventsLoading,
+            isRefreshing = loading,
             onRefresh = {
                 postViewModel.refresh()
                 eventViewModel.refresh()
@@ -151,6 +153,7 @@ fun MainFeed(
                 onEventClick = onEventClick,
                 onPostLike = postViewModel::toggleLike,
                 onEventLike = eventViewModel::toggleLike,
+                isLoading = loading && items.isEmpty(),
                 emptyMessage = when {
                     error != null && items.isEmpty() ->
                         stringResource(R.string.feed_error_retry, error)
@@ -173,6 +176,8 @@ fun LikesScreen(
 ) {
     val likedPosts by postViewModel.likedPosts.collectAsStateWithLifecycle()
     val likedEvents by eventViewModel.likedEvents.collectAsStateWithLifecycle()
+    val postsLoading by postViewModel.isLoading.collectAsStateWithLifecycle()
+    val eventsLoading by eventViewModel.isLoading.collectAsStateWithLifecycle()
 
     val items = remember(likedPosts, likedEvents) {
         buildFeedItems(likedPosts, likedEvents)
@@ -192,6 +197,7 @@ fun LikesScreen(
             onEventClick = onEventClick,
             onPostLike = postViewModel::toggleLike,
             onEventLike = eventViewModel::toggleLike,
+            isLoading = (postsLoading || eventsLoading) && items.isEmpty(),
             emptyMessage = stringResource(R.string.likes_empty),
             modifier = Modifier.weight(1f)
         )
@@ -230,8 +236,8 @@ private fun SearchField(
             null
         },
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
@@ -247,6 +253,7 @@ internal fun FeedList(
     onPostLike: (Int) -> Unit,
     onEventLike: (Int) -> Unit,
     emptyMessage: String,
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     if (items.isEmpty()) {
@@ -256,12 +263,16 @@ internal fun FeedList(
                 .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = emptyMessage,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.secondary,
-                textAlign = TextAlign.Center
-            )
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text(
+                    text = emptyMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     } else {
         LazyColumn(
@@ -270,7 +281,7 @@ internal fun FeedList(
                 start = 20.dp,
                 end = 20.dp,
                 top = 4.dp,
-                bottom = bottomBarSpace()
+                bottom = 20.dp
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -351,7 +362,9 @@ private fun FeedCard(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column {

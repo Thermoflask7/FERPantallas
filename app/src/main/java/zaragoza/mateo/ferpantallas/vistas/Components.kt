@@ -1,5 +1,7 @@
 package zaragoza.mateo.ferpantallas.vistas
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,13 +11,10 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +29,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -60,15 +60,16 @@ internal val DetailBackground = Color(0xFF1A3989)
 internal val DividerColor = Color(0xFFB5B5B5)
 internal val SpanishLocale: Locale = Locale.forLanguageTag("es-MX")
 
-@Composable
-internal fun bottomBarSpace(): Dp =
-    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 100.dp
-
-internal fun UriHandler.openSafely(url: String) {
-    if (url.isBlank()) return
+internal fun UriHandler.openSafely(context: Context, url: String) {
+    val failed = context.getString(R.string.link_open_failed)
+    if (url.isBlank()) {
+        Toast.makeText(context, failed, Toast.LENGTH_SHORT).show()
+        return
+    }
     try {
         openUri(url)
     } catch (e: Exception) {
+        Toast.makeText(context, failed, Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -148,6 +149,20 @@ fun FerTopBar(modifier: Modifier = Modifier) {
                 fontSize = 14.sp,
                 lineHeight = 15.sp
             )
+        }
+    }
+}
+
+@Composable
+internal fun LoadingMessage(onBack: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        CircularProgressIndicator()
+        TextButton(onClick = onBack) {
+            Text(stringResource(R.string.action_back))
         }
     }
 }
@@ -249,7 +264,7 @@ internal fun DetailLayout(
                     .fillMaxWidth()
                     .heightIn(min = minSheetHeight)
                     .background(
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                     )
                     .navigationBarsPadding()

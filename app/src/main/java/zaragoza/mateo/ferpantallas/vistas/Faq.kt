@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -249,7 +250,11 @@ fun PreguntaItem(
                     if (expanded) R.string.cd_cerrar_respuesta else R.string.cd_ver_mas,
                 ),
                 modifier = Modifier.size(24.dp),
-                tint = colorResource(id = R.color.azulfer),
+                tint = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
+                    colorResource(R.color.azulfer_claro)
+                } else {
+                    colorResource(id = R.color.azulfer)
+                },
             )
         }
         if (expanded) {

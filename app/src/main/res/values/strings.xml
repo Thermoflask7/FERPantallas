@@ -105,6 +105,7 @@
     <string name="time_am">am</string>
     <string name="time_pm">pm</string>
     <string name="action_sharing">Compartiendo...</string>
+    <string name="link_open_failed">No se pudo abrir el enlace</string>
     <string name="action_adding_calendar">Agregando al calendario...</string>
     <string name="action_back">Volver</string>
     <string name="brand_logo_stacked">FUNDACIÓN\nESPOSOS\nRODRÍGUEZ</string>

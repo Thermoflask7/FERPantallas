@@ -42,14 +42,6 @@ class EventVM(application: Application) : AndroidViewModel(application) {
             emptyList()
         )
 
-    val interestedEvents = events
-        .map { list -> list.filter { it.isInterested } }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList()
-        )
-
     init {
         refresh()
     }
@@ -57,9 +49,9 @@ class EventVM(application: Application) : AndroidViewModel(application) {
     fun refresh() {
         if (_isLoading.value) return
 
+        _isLoading.value = true
+        _error.value = null
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
             try {
                 _events.value = api.getEvents().data.orEmpty()
                     .mapNotNull { it.toModel() }

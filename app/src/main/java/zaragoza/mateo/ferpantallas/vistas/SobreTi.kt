@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -181,19 +182,23 @@ private data class OpcionSobreTi(
 
 @Composable
 private fun CirculoOpcion(seleccionado: Boolean) {
-    val azul = colorResource(R.color.azulfer)
+    val marca = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
+        colorResource(R.color.azulfer_claro)
+    } else {
+        colorResource(R.color.azulfer)
+    }
     if (seleccionado) {
         Box(
             modifier = Modifier
                 .size(22.dp)
-                .border(width = 2.dp, color = azul, shape = CircleShape),
+                .border(width = 2.dp, color = marca, shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Box(
                 modifier = Modifier
                     .size(12.dp)
                     .clip(CircleShape)
-                    .background(azul),
+                    .background(marca),
             )
         }
     } else {

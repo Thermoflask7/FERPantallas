@@ -58,10 +58,17 @@ fun PostDetailScreen(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val posts by viewModel.posts.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
     val post = posts.firstOrNull { it.id == postId }
 
-    if (post == null) {
-        NotFoundMessage(text = stringResource(R.string.post_not_found), onBack = onBack)
+    if (post == null && isLoading) {
+        LoadingMessage(onBack = onBack)
+    } else if (post == null) {
+        NotFoundMessage(
+            text = error ?: stringResource(R.string.post_not_found),
+            onBack = onBack,
+        )
     } else {
         PostDetailContent(
             post = post,
@@ -70,7 +77,7 @@ fun PostDetailScreen(
             onShareClick = {
                 Toast.makeText(context, context.getString(R.string.action_sharing), Toast.LENGTH_SHORT).show()
             },
-            onAttachmentClick = { url -> uriHandler.openSafely(url) }
+            onAttachmentClick = { url -> uriHandler.openSafely(context, url) }
         )
     }
 }
