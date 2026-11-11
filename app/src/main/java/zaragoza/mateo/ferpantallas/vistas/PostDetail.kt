@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
+import zaragoza.mateo.ferpantallas.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,9 +48,6 @@ import zaragoza.mateo.ferpantallas.modelos.PostAttachment
 import zaragoza.mateo.ferpantallas.viewmodels.PostVM
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-private val postDateFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("dd 'de' MMMM", SpanishLocale)
 
 @Composable
 fun PostDetailScreen(
@@ -61,14 +61,14 @@ fun PostDetailScreen(
     val post = posts.firstOrNull { it.id == postId }
 
     if (post == null) {
-        NotFoundMessage(text = "Publicación no encontrada", onBack = onBack)
+        NotFoundMessage(text = stringResource(R.string.post_not_found), onBack = onBack)
     } else {
         PostDetailContent(
             post = post,
             onBack = onBack,
             onLikeClick = { viewModel.toggleLike(post.id) },
             onShareClick = {
-                Toast.makeText(context, "Compartiendo...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.action_sharing), Toast.LENGTH_SHORT).show()
             },
             onAttachmentClick = { url -> uriHandler.openSafely(url) }
         )
@@ -83,8 +83,15 @@ fun PostDetailContent(
     onShareClick: () -> Unit,
     onAttachmentClick: (String) -> Unit
 ) {
-    val dateText = post.createdAt.format(postDateFormatter).let {
-        if (post.updatedAt != null) "$it · editado" else it
+    val datePattern = stringResource(R.string.post_date_pattern)
+    val dateFormatter = remember(datePattern) {
+        DateTimeFormatter.ofPattern(datePattern, SpanishLocale)
+    }
+    val formattedDate = post.createdAt.format(dateFormatter)
+    val dateText = if (post.updatedAt != null) {
+        stringResource(R.string.post_date_edited, formattedDate)
+    } else {
+        formattedDate
     }
 
     DetailLayout(
@@ -153,7 +160,7 @@ internal fun PostAttachmentItem(
 
             AsyncImage(
                 model = attachment.url,
-                contentDescription = "Imagen adjunta",
+                contentDescription = stringResource(R.string.cd_attachment_image),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,7 +183,7 @@ internal fun PostAttachmentItem(
                 attachment.thumbnailUrl?.let {
                     AsyncImage(
                         model = it,
-                        contentDescription = "Miniatura del video",
+                        contentDescription = stringResource(R.string.cd_video_thumbnail),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -193,7 +200,7 @@ internal fun PostAttachmentItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Reproducir video",
+                        contentDescription = stringResource(R.string.cd_play_video),
                         tint = Color.White,
                         modifier = Modifier.size(26.dp)
                     )
@@ -220,7 +227,7 @@ internal fun PostAttachmentItem(
 
                     Column {
                         Text(
-                            text = attachment.title ?: "Enlace",
+                            text = attachment.title ?: stringResource(R.string.post_link_fallback),
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
@@ -258,7 +265,9 @@ internal fun PostAttachmentItem(
 
                     Column {
                         Text(
-                            text = attachment.name,
+                            text = attachment.name.ifBlank {
+                                stringResource(R.string.post_file_fallback)
+                            },
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
@@ -267,7 +276,7 @@ internal fun PostAttachmentItem(
                         )
                         attachment.size?.let {
                             Text(
-                                text = "${it / 1024} KB",
+                                text = stringResource(R.string.file_size_kb, it / 1024),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }

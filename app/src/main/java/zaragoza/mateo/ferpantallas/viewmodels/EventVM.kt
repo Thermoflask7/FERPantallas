@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import zaragoza.mateo.ferpantallas.R
 import zaragoza.mateo.ferpantallas.modelos.Event
 import zaragoza.mateo.ferpantallas.network.RetrofitClient
 import zaragoza.mateo.ferpantallas.network.toModel
@@ -76,7 +77,7 @@ class EventVM(application: Application) : AndroidViewModel(application) {
                 throw e
             } catch (e: Exception) {
                 Log.e("EventVM", "Failed to load events", e)
-                _error.value = "No se pudieron cargar los eventos"
+                _error.value = getApplication<Application>().getString(R.string.events_load_error)
             } finally {
                 _isLoading.value = false
             }

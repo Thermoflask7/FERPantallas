@@ -68,7 +68,7 @@ private fun AttachmentDto.toAttachment(index: Int): PostAttachment? {
             PostAttachment.File(
                 id = attachmentId,
                 url = it,
-                name = firstMedia?.name ?: title ?: "Archivo",
+                name = firstMedia?.name ?: title.orEmpty(),
                 mimeType = firstMedia?.mime ?: "application/octet-stream",
                 size = firstMedia?.size?.let { kb -> (kb * 1024).toLong() }
             )

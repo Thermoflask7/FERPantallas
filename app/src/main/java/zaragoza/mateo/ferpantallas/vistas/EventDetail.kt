@@ -31,12 +31,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
+import zaragoza.mateo.ferpantallas.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,15 +51,9 @@ import zaragoza.mateo.ferpantallas.viewmodels.EventVM
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private val eventDayFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", SpanishLocale)
-
-private val shortMonthFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("MMM", SpanishLocale)
-
-private fun formatTime(time: LocalDateTime): String {
+private fun formatTime(time: LocalDateTime, am: String, pm: String): String {
     val hour12 = if (time.hour % 12 == 0) 12 else time.hour % 12
-    val suffix = if (time.hour < 12) "am" else "pm"
+    val suffix = if (time.hour < 12) am else pm
     return if (time.minute == 0) {
         "$hour12$suffix"
     } else {
@@ -64,9 +61,16 @@ private fun formatTime(time: LocalDateTime): String {
     }
 }
 
+@Composable
 private fun Event.timeLabel(): String {
+    val am = stringResource(R.string.time_am)
+    val pm = stringResource(R.string.time_pm)
     val end = endDateTime
-    return if (end != null) "${formatTime(dateTime)} - ${formatTime(end)}" else formatTime(dateTime)
+    return if (end != null) {
+        "${formatTime(dateTime, am, pm)} - ${formatTime(end, am, pm)}"
+    } else {
+        formatTime(dateTime, am, pm)
+    }
 }
 
 @Composable
@@ -81,7 +85,7 @@ fun EventDetailScreen(
     val event = events.firstOrNull { it.id == eventId }
 
     if (event == null) {
-        NotFoundMessage(text = "Evento no encontrado", onBack = onBack)
+        NotFoundMessage(text = stringResource(R.string.event_not_found), onBack = onBack)
     } else {
         EventDetailContent(
             event = event,
@@ -89,10 +93,14 @@ fun EventDetailScreen(
             onLikeClick = { viewModel.toggleLike(event.id) },
             onInterestClick = { viewModel.toggleInterest(event.id) },
             onShareClick = {
-                Toast.makeText(context, "Compartiendo...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.action_sharing), Toast.LENGTH_SHORT).show()
             },
             onCalendarClick = {
-                Toast.makeText(context, "Agregando al calendario...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.action_adding_calendar),
+                    Toast.LENGTH_SHORT,
+                ).show()
             },
             onRegisterClick = { uriHandler.openSafely(event.registerLink) }
         )
@@ -109,6 +117,10 @@ fun EventDetailContent(
     onCalendarClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
+    val eventDatePattern = stringResource(R.string.event_date_pattern)
+    val eventDayFormatter = remember(eventDatePattern) {
+        DateTimeFormatter.ofPattern(eventDatePattern, SpanishLocale)
+    }
     DetailLayout(
         imageUrl = event.photo,
         imageDescription = event.title,
@@ -158,7 +170,7 @@ fun EventDetailContent(
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                text = "Descripción",
+                text = stringResource(R.string.event_description),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -171,7 +183,7 @@ fun EventDetailContent(
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                text = "Detalles",
+                text = stringResource(R.string.event_details),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -185,13 +197,13 @@ fun EventDetailContent(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     DetailItem(
-                        detailTitle = "Fecha",
+                        detailTitle = stringResource(R.string.event_date),
                         detailBody = event.dateTime.format(eventDayFormatter)
                             .replaceFirstChar { it.uppercase() },
                         icon = Icons.Default.CalendarMonth
                     )
                     DetailItem(
-                        detailTitle = "Lugar",
+                        detailTitle = stringResource(R.string.event_place),
                         detailBody = event.location,
                         icon = Icons.Default.LocationOn
                     )
@@ -202,12 +214,12 @@ fun EventDetailContent(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     DetailItem(
-                        detailTitle = "Horario",
+                        detailTitle = stringResource(R.string.event_time),
                         detailBody = event.timeLabel(),
                         icon = Icons.Default.AccessTimeFilled
                     )
                     DetailItem(
-                        detailTitle = "Costo",
+                        detailTitle = stringResource(R.string.event_cost),
                         detailBody = event.cost,
                         icon = Icons.Default.AttachMoney
                     )
@@ -215,8 +227,10 @@ fun EventDetailContent(
             }
 
             DetailItem(
-                detailTitle = "Registro",
-                detailBody = event.registerLink.ifBlank { "No requerido" },
+                detailTitle = stringResource(R.string.event_registration),
+                detailBody = event.registerLink.ifBlank {
+                    stringResource(R.string.event_registration_none)
+                },
                 icon = Icons.Default.Link,
                 maxLines = 1,
                 onClick = if (event.registerLink.isNotBlank()) onRegisterClick else null
@@ -254,14 +268,16 @@ fun EventDetailContent(
                 }
             ) {
                 Text(
-                    text = if (event.isInterested) "Te interesa" else "Me interesa",
+                    text = stringResource(
+                        if (event.isInterested) R.string.event_interested else R.string.event_interest,
+                    ),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
 
             CircleIconButton(
                 imageVector = Icons.Default.CalendarToday,
-                contentDescription = "Agregar al calendario",
+                contentDescription = stringResource(R.string.cd_add_calendar),
                 onClick = onCalendarClick,
                 size = 56.dp,
                 borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)
@@ -321,6 +337,10 @@ fun DetailItem(
 
 @Composable
 fun DateItem(date: LocalDateTime) {
+    val monthPattern = stringResource(R.string.event_month_pattern)
+    val monthFormatter = remember(monthPattern) {
+        DateTimeFormatter.ofPattern(monthPattern, SpanishLocale)
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -342,7 +362,7 @@ fun DateItem(date: LocalDateTime) {
             )
         }
         Text(
-            text = date.format(shortMonthFormatter)
+            text = date.format(monthFormatter)
                 .replace(".", "")
                 .replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.bodyMedium,

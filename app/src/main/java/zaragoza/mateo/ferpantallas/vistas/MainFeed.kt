@@ -42,8 +42,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import zaragoza.mateo.ferpantallas.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -151,9 +153,9 @@ fun MainFeed(
                 onEventLike = eventViewModel::toggleLike,
                 emptyMessage = when {
                     error != null && items.isEmpty() ->
-                        "$error\nDesliza hacia abajo para reintentar"
-                    query.isBlank() -> "Aún no hay publicaciones"
-                    else -> "Sin resultados para \"$query\""
+                        stringResource(R.string.feed_error_retry, error)
+                    query.isBlank() -> stringResource(R.string.feed_empty)
+                    else -> stringResource(R.string.feed_no_results, query)
                 },
                 modifier = Modifier.fillMaxSize()
             )
@@ -178,7 +180,7 @@ fun LikesScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         Text(
-            text = "Mis likes",
+            text = stringResource(R.string.likes_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
@@ -190,7 +192,7 @@ fun LikesScreen(
             onEventClick = onEventClick,
             onPostLike = postViewModel::toggleLike,
             onEventLike = eventViewModel::toggleLike,
-            emptyMessage = "Aún no has dado like a nada",
+            emptyMessage = stringResource(R.string.likes_empty),
             modifier = Modifier.weight(1f)
         )
     }
@@ -211,7 +213,7 @@ private fun SearchField(
             .shadow(4.dp, RoundedCornerShape(50)),
         singleLine = true,
         shape = RoundedCornerShape(50),
-        placeholder = { Text("Buscar en publicaciones...") },
+        placeholder = { Text(stringResource(R.string.feed_search_hint)) },
         leadingIcon = {
             Icon(imageVector = Icons.Default.Search, contentDescription = null)
         },
@@ -220,7 +222,7 @@ private fun SearchField(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Borrar búsqueda"
+                        contentDescription = stringResource(R.string.cd_clear_search)
                     )
                 }
             }
@@ -327,7 +329,7 @@ fun EventCard(
         onClick = onClick,
         onLikeClick = onLikeClick,
         modifier = modifier,
-        badge = "Evento"
+        badge = stringResource(R.string.feed_event_badge)
     )
 }
 

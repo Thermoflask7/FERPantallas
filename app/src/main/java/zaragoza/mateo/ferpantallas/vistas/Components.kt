@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import zaragoza.mateo.ferpantallas.R
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -111,7 +113,9 @@ internal fun LikeCircleButton(
 ) {
     CircleIconButton(
         imageVector = if (liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-        contentDescription = if (liked) "Quitar me gusta" else "Me gusta",
+        contentDescription = stringResource(
+            if (liked) R.string.cd_remove_like else R.string.cd_like,
+        ),
         onClick = onClick,
         modifier = modifier,
         size = size,
@@ -136,7 +140,7 @@ fun FerTopBar(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "FUNDACIÓN\nESPOSOS\nRODRÍGUEZ",
+                text = stringResource(R.string.brand_logo_stacked),
                 color = Color.White,
                 textAlign = TextAlign.Center,
                 fontFamily = FontFamily.Serif,
@@ -157,7 +161,7 @@ internal fun NotFoundMessage(text: String, onBack: () -> Unit) {
     ) {
         Text(text = text, style = MaterialTheme.typography.titleMedium)
         TextButton(onClick = onBack) {
-            Text("Volver")
+            Text(stringResource(R.string.action_back))
         }
     }
 }
@@ -213,7 +217,7 @@ internal fun DetailLayout(
                 ) {
                     CircleIconButton(
                         imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "Regresar",
+                        contentDescription = stringResource(R.string.cd_go_back),
                         onClick = onBack
                     )
 
@@ -223,7 +227,7 @@ internal fun DetailLayout(
                         }
                         CircleIconButton(
                             imageVector = Icons.Default.Share,
-                            contentDescription = "Compartir",
+                            contentDescription = stringResource(R.string.cd_share),
                             onClick = onShareClick
                         )
                     }
