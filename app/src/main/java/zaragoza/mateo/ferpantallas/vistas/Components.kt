@@ -80,8 +80,8 @@ internal fun CircleIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 44.dp,
-    containerColor: Color = Color.White,
-    tint: Color = MaterialTheme.colorScheme.tertiary,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    tint: Color = MaterialTheme.colorScheme.secondary,
     borderColor: Color? = null
 ) {
     Box(
@@ -120,8 +120,8 @@ internal fun LikeCircleButton(
         onClick = onClick,
         modifier = modifier,
         size = size,
-        containerColor = if (liked) MaterialTheme.colorScheme.primary else Color.White,
-        tint = if (liked) Color.White else MaterialTheme.colorScheme.tertiary
+        containerColor = if (liked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest,
+        tint = if (liked) Color.White else MaterialTheme.colorScheme.secondary
     )
 }
 
@@ -236,16 +236,6 @@ internal fun DetailLayout(
                         onClick = onBack
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        if (!hasImage) {
-                            LikeCircleButton(liked = liked, onClick = onLikeClick)
-                        }
-                        CircleIconButton(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = stringResource(R.string.cd_share),
-                            onClick = onShareClick
-                        )
-                    }
                 }
 
                 if (hasImage) {
