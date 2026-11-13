@@ -77,6 +77,7 @@ import zaragoza.mateo.ferpantallas.R
 import zaragoza.mateo.ferpantallas.modelos.EducationLevel
 import zaragoza.mateo.ferpantallas.modelos.ScholarshipProfile
 import zaragoza.mateo.ferpantallas.ui.theme.FERPantallasTheme
+import zaragoza.mateo.ferpantallas.ui.theme.Poppins
 
 
 private val BgTop = Color(0xFF3A6AC0)
@@ -274,16 +275,18 @@ private fun IntroBody() {
             Text(
                 text = stringResource(R.string.bienvenida_titulo),
                 style = TextStyle(
+                    fontFamily = Poppins,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 46.sp,
+                    fontSize = 50.sp,
                     color = Color.White,
                 ),
             )
             Text(
                 text = stringResource(R.string.bienvenida_subtitulo),
                 style = TextStyle(
+                    fontFamily = Poppins,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 20.sp,
+                    fontSize = 22.sp,
                     color = SubtitleColor,
                     letterSpacing = 0.3.sp,
                 ),
@@ -404,6 +407,7 @@ private fun OptionQuestion(
             text = question,
             textAlign = TextAlign.Center,
             style = TextStyle(
+                fontFamily = Poppins,
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp,
                 color = Color.White,
@@ -458,6 +462,7 @@ private fun OptionPill(
         Text(
             text = text,
             style = TextStyle(
+                fontFamily = Poppins,
                 fontWeight = FontWeight.Medium,
                 fontSize = 17.sp,
                 letterSpacing = 0.4.sp,
@@ -505,6 +510,7 @@ private fun ContinueButton(
         Text(
             text = text,
             style = TextStyle(
+                fontFamily = Poppins,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
                 color = ButtonText,
