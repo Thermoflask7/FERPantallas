@@ -100,6 +100,7 @@
     <string name="event_time">Horario</string>
     <string name="event_cost">Costo</string>
     <string name="event_registration">Registro</string>
+    <string name="calendar_error">No se pudo agregar el evento a tu calendario.</string>
     <string name="event_registration_none">No requerido</string>
     <string name="event_interested">Te interesa</string>
     <string name="event_interest">Me interesa</string>
