@@ -56,6 +56,7 @@
     <string name="bienvenida_subtitulo">Personaliza tu experiencia.</string>
     <string name="bienvenida_pregunta_perfil">¿Cuál es tu perfil?</string>
     <string name="bienvenida_pregunta_nivel">¿Cuál es tu nivel educativo?</string>
+    <string name="bienvenida_comenzar">Comenzar</string>
     <string name="bienvenida_continuar">Continuar</string>
     <string name="bienvenida_logo_fundacion">Fundación</string>
     <string name="bienvenida_logo_esposos">Esposos</string>
