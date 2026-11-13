@@ -1,5 +1,10 @@
 package zaragoza.mateo.ferpantallas.vistas
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.provider.CalendarContract
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -50,6 +55,7 @@ import zaragoza.mateo.ferpantallas.modelos.Event
 import zaragoza.mateo.ferpantallas.viewmodels.EventVM
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 
 private fun formatTime(time: LocalDateTime, am: String, pm: String): String {
     val hour12 = if (time.hour % 12 == 0) 12 else time.hour % 12
@@ -100,20 +106,49 @@ fun EventDetailScreen(
             onLikeClick = { viewModel.toggleLike(event.id) },
             onInterestClick = { viewModel.toggleInterest(event.id) },
             onShareClick = {
-                Toast.makeText(context, context.getString(R.string.action_sharing), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.action_sharing, Toast.LENGTH_SHORT).show()
             },
             onCalendarClick = {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.action_adding_calendar),
-                    Toast.LENGTH_SHORT,
-                ).show()
+                openCalendar(
+                    context = context,
+                    title = event.title,
+                    description = event.description,
+                    location = event.location,
+                    start = event.dateTime,
+                    end = event.endDateTime
+                )
             },
             onRegisterClick = { uriHandler.openSafely(context, event.registerLink) }
         )
     }
 }
 
+fun openCalendar(
+    context: Context,
+    title: String,
+    description: String,
+    location: String,
+    start: LocalDateTime,
+    end: LocalDateTime? = null,
+) {
+    val zone = ZoneId.systemDefault()
+    val startMillis = start.atZone(zone).toInstant().toEpochMilli()
+    val endMillis = (end ?: start.plusHours(1)).atZone(zone).toInstant().toEpochMilli()
+
+    val intent = Intent(Intent.ACTION_INSERT).apply {
+        data = CalendarContract.Events.CONTENT_URI
+        putExtra(CalendarContract.Events.TITLE, title)
+        putExtra(CalendarContract.Events.DESCRIPTION, description)
+        putExtra(CalendarContract.Events.EVENT_LOCATION, location)
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis)
+    }
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(context, R.string.calendar_error, Toast.LENGTH_SHORT).show()
+    }
+}
 @Composable
 fun EventDetailContent(
     event: Event,
