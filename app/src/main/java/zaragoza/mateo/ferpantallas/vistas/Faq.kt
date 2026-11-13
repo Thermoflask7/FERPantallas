@@ -3,7 +3,7 @@ package zaragoza.mateo.ferpantallas.vistas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -99,26 +99,25 @@ fun FaqContent(
                 },
             )
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 FaqFilterChip(
                     text = stringResource(R.string.filtro_todas),
                     selected = selectedFilter == FaqCategory.TODAS,
                     onClick = { onFilterSelected(FaqCategory.TODAS) },
-                    modifier = Modifier.weight(1f),
                 )
                 FaqFilterChip(
                     text = stringResource(R.string.filtro_aspirantes),
                     selected = selectedFilter == FaqCategory.ASPIRANTES,
                     onClick = { onFilterSelected(FaqCategory.ASPIRANTES) },
-                    modifier = Modifier.weight(1f),
                 )
                 FaqFilterChip(
                     text = stringResource(R.string.filtro_becarios),
                     selected = selectedFilter == FaqCategory.BECARIOS,
                     onClick = { onFilterSelected(FaqCategory.BECARIOS) },
-                    modifier = Modifier.weight(1f),
                 )
             }
         }
@@ -198,17 +197,17 @@ private fun FaqFilterChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         label = {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(text)
-            }
+            Text(
+                text = text,
+                maxLines = 1,
+                softWrap = false,
+            )
         },
-        modifier = modifier,
         shape = RoundedCornerShape(20.dp),
         colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = colorResource(id = R.color.azulfer),
