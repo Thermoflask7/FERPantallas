@@ -1,34 +1,43 @@
 package zaragoza.mateo.ferpantallas.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.text.googlefonts.R
 
-// Set of Material typography styles to start with
+private val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs,
+)
+
+private val fontName = GoogleFont("Poppins")
+
+val Poppins = FontFamily(
+    Font(fontName, provider, FontWeight.Normal),
+    Font(fontName, provider, FontWeight.Medium),
+    Font(fontName, provider, FontWeight.SemiBold),
+    Font(fontName, provider, FontWeight.Bold),
+)
+private val base = Typography()
+
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+    displayLarge = base.displayLarge.copy(fontFamily = Poppins),
+    displayMedium = base.displayMedium.copy(fontFamily = Poppins),
+    displaySmall = base.displaySmall.copy(fontFamily = Poppins),
+    headlineLarge = base.headlineLarge.copy(fontFamily = Poppins),
+    headlineMedium = base.headlineMedium.copy(fontFamily = Poppins),
+    headlineSmall = base.headlineSmall.copy(fontFamily = Poppins),
+    titleLarge = base.titleLarge.copy(fontFamily = Poppins),
+    titleMedium = base.titleMedium.copy(fontFamily = Poppins),
+    titleSmall = base.titleSmall.copy(fontFamily = Poppins),
+    bodyLarge = base.bodyLarge.copy(fontFamily = Poppins),
+    bodyMedium = base.bodyMedium.copy(fontFamily = Poppins),
+    bodySmall = base.bodySmall.copy(fontFamily = Poppins),
+    labelLarge = base.labelLarge.copy(fontFamily = Poppins),
+    labelMedium = base.labelMedium.copy(fontFamily = Poppins),
+    labelSmall = base.labelSmall.copy(fontFamily = Poppins),
 )

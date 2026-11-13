@@ -25,17 +25,40 @@ fun FERPantallasTheme(
     textScale: Float = 1f,
     content: @Composable () -> Unit,
 ) {
-    val azulFer = colorResource(R.color.azulfer)
+    val accent = colorResource(R.color.fer_blue)
+    val background = colorResource(R.color.fer_background)
+    val textGray = colorResource(R.color.fer_text_gray)
+    val lightGray = colorResource(R.color.fer_light_gray)
+    val brightBlue = colorResource(R.color.fer_bright_blue)
+
     val colorScheme = if (darkTheme) {
-        darkColorScheme(primary = azulFer, onPrimary = Color.White)
+        darkColorScheme(
+            primary = brightBlue,
+            onPrimary = Color.White,
+            secondary = lightGray,
+            tertiary = lightGray,
+        )
     } else {
         lightColorScheme(
-            primary = azulFer,
+            primary = accent,
             onPrimary = Color.White,
-            background = Color.White,
+            secondary = textGray,
+            onSecondary = Color.White,
+            tertiary = lightGray,
+            onTertiary = Color.White,
+            background = background,
+            onBackground = textGray,
             surface = Color.White,
+            onSurface = textGray,
+            onSurfaceVariant = textGray,
+            surfaceVariant = Color.White,
+            surfaceContainer = Color.White,
+            surfaceContainerLow = Color.White,
+            surfaceContainerHigh = Color.White,
+            surfaceContainerHighest = Color.White,
         )
     }
+
     val view = LocalView.current
     val activity = view.context.findActivity()
     if (!view.isInEditMode && activity != null) {

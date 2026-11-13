@@ -20,7 +20,7 @@ fun FerHeader() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RectangleShape,
-        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.azulfer)),
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.fer_blue)),
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),

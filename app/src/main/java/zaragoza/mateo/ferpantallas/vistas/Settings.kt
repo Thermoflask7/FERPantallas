@@ -251,9 +251,9 @@ private fun RadioSection(
                         onClick = option.onClick,
                         colors = RadioButtonDefaults.colors(
                             selectedColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
-                                colorResource(R.color.azulfer_claro)
+                                colorResource(R.color.fer_bright_blue)
                             } else {
-                                colorResource(R.color.azulfer)
+                                colorResource(R.color.fer_blue)
                             },
                         ),
                     )
@@ -326,7 +326,7 @@ private fun SettingsRow(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = colorResource(R.color.azulfer),
+                    tint = colorResource(R.color.fer_blue),
                 )
             }
         }

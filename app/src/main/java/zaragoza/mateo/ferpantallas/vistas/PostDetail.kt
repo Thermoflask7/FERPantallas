@@ -75,7 +75,7 @@ fun PostDetailScreen(
             onBack = onBack,
             onLikeClick = { viewModel.toggleLike(post.id) },
             onShareClick = {
-                Toast.makeText(context, context.getString(R.string.action_sharing), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.action_sharing, Toast.LENGTH_SHORT).show()
             },
             onAttachmentClick = { url -> uriHandler.openSafely(context, url) }
         )

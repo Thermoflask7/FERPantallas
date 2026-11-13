@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="azulfer">#1A3989</color>
-    <color name="azulfer_claro">#8EA2D6</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="fer_blue">#1238BA</color>
+    <color name="fer_background">#F2F2F7</color>
+    <color name="fer_text_gray">#757575</color>
+    <color name="fer_light_gray">#9B9B9B</color>
+    <color name="fer_teal">#5DBABB</color>
+    <color name="fer_bright_blue">#2F70DF</color>
 </resources>

@@ -149,7 +149,7 @@ fun FaqContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(30.dp),
-                colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.azulfer)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.fer_blue)),
             ) {
                 CompositionLocalProvider(LocalContentColor provides Color.White) {
                     Row(
@@ -210,7 +210,7 @@ private fun FaqFilterChip(
         },
         shape = RoundedCornerShape(20.dp),
         colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = colorResource(id = R.color.azulfer),
+            selectedContainerColor = colorResource(id = R.color.fer_blue),
             selectedLabelColor = Color.White,
             containerColor = Color.Transparent,
             labelColor = MaterialTheme.colorScheme.onSurface,
@@ -250,9 +250,9 @@ fun QuestionRow(
                 ),
                 modifier = Modifier.size(24.dp),
                 tint = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
-                    colorResource(R.color.azulfer_claro)
+                    colorResource(R.color.fer_bright_blue)
                 } else {
-                    colorResource(id = R.color.azulfer)
+                    colorResource(id = R.color.fer_blue)
                 },
             )
         }

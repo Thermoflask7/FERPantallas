@@ -78,7 +78,7 @@ fun AboutYouContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(R.color.azulfer))
+                .background(colorResource(R.color.fer_blue))
                 .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -86,12 +86,12 @@ fun AboutYouContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.cd_volver),
-                    tint = colorResource(R.color.white),
+                    tint = Color.White,
                 )
             }
             Text(
                 text = stringResource(R.string.sobre_ti_titulo),
-                color = colorResource(R.color.white),
+                color = Color.White,
                 style = MaterialTheme.typography.titleLarge,
             )
         }
@@ -183,9 +183,9 @@ private data class AboutYouOption(
 @Composable
 private fun OptionCircle(isSelected: Boolean) {
     val markColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
-        colorResource(R.color.azulfer_claro)
+        colorResource(R.color.fer_bright_blue)
     } else {
-        colorResource(R.color.azulfer)
+        colorResource(R.color.fer_blue)
     }
     if (isSelected) {
         Box(
