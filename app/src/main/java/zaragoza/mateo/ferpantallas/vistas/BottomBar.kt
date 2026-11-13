@@ -54,7 +54,7 @@ fun BottomBar(
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 12.dp),
         shape = RoundedCornerShape(50),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
         shadowElevation = 8.dp,
     ) {
         Row(
@@ -104,7 +104,7 @@ private fun BarIcon(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val tint = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF5F5F5F)
+    val tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
 
     Column(
         modifier = Modifier

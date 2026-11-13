@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import zaragoza.mateo.ferpantallas.R
 import androidx.compose.ui.text.font.FontWeight
@@ -287,43 +288,32 @@ fun EventDetailContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = onInterestClick,
+                onClick = onCalendarClick,
                 modifier = Modifier
                     .weight(1f)
-                    .height(56.dp),
+                    .height(56.dp)
+                    .padding(2.dp),
                 shape = RoundedCornerShape(50),
-                colors = if (event.isInterested) {
-                    ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                border = if (event.isInterested) {
-                    BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-                } else {
-                    null
-                }
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
             ) {
-                Text(
-                    text = stringResource(
-                        if (event.isInterested) R.string.event_interested else R.string.event_interest,
-                    ),
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+                Row(modifier = Modifier.fillMaxWidth(), Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
 
-            CircleIconButton(
-                imageVector = Icons.Default.CalendarToday,
-                contentDescription = stringResource(R.string.cd_add_calendar),
-                onClick = onCalendarClick,
-                size = 56.dp,
-                borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)
-            )
+                    Text(
+                        text = stringResource(R.string.cd_add_calendar)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = stringResource(R.string.cd_add_calendar),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                }
+
+
+            }
         }
     }
 }
@@ -391,7 +381,7 @@ fun DateItem(date: LocalDateTime) {
             modifier = Modifier
                 .size(44.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = colorResource(R.color.fer_bright_blue),
                     shape = RoundedCornerShape(12.dp)
                 ),
             contentAlignment = Alignment.Center
