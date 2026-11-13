@@ -1,8 +1,8 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-// PREPARATORIA, UNIVERSIDAD and POSGRADO are saved on the device.
-enum class EducationLevel {
-    PREPARATORIA,
-    UNIVERSIDAD,
-    POSGRADO,
+// Names are saved on the device. slug is the Strapi level used by the feed.
+enum class EducationLevel(val slug: String) {
+    PREPARATORIA("prepa"),
+    UNIVERSIDAD("uni"),
+    POSGRADO("posgrado"),
 }

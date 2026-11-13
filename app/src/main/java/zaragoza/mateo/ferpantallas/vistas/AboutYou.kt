@@ -225,6 +225,7 @@ private fun profileLabel(profile: ScholarshipProfile): String {
     return when (profile) {
         ScholarshipProfile.ASPIRANTE -> stringResource(R.string.perfil_aspirante)
         ScholarshipProfile.BECADO -> stringResource(R.string.perfil_becado)
+        ScholarshipProfile.OTROS -> stringResource(R.string.perfil_otros)
     }
 }
 

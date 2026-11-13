@@ -1,7 +1,8 @@
 package zaragoza.mateo.ferpantallas.modelos
 
-// ASPIRANTE and BECADO are saved on the device.
-enum class ScholarshipProfile {
-    ASPIRANTE,
-    BECADO,
+// Names are saved on the device. slug is the Strapi audience used by the feed.
+enum class ScholarshipProfile(val slug: String) {
+    ASPIRANTE("aspirantes"),
+    BECADO("becados"),
+    OTROS("otros"),
 }

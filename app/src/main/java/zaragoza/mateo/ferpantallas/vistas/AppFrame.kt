@@ -31,6 +31,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import zaragoza.mateo.ferpantallas.modelos.Destination
 import zaragoza.mateo.ferpantallas.modelos.AppTheme
+import zaragoza.mateo.ferpantallas.modelos.UserProfile
 import zaragoza.mateo.ferpantallas.viewmodels.SettingsViewModel
 import zaragoza.mateo.ferpantallas.viewmodels.AboutYouViewModel
 
@@ -82,6 +83,10 @@ fun AppFrame(
                     },
                 )
                 Destination.FEED -> MainFeed(
+                    profile = UserProfile(
+                        audience = aboutYouViewModel.profile.slug,
+                        level = aboutYouViewModel.level.slug,
+                    ),
                     onPostClick = { id ->
                         detailOrigin = Destination.FEED.name
                         postId = id
